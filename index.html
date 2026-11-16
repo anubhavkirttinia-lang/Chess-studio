@@ -1,0 +1,3361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess Studio — Home, Pro Players, Arena & Game Review</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #020617;
+      --panel: #0f172a;
+      --panel-2: #1e293b;
+      --border: #1e293b;
+      --border-2: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --dim: #64748b;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --sky: #38bdf8;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.4;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.92);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+    }
+    .header-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: rgba(16, 185, 129, 0.16); color: #34d399;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 700;
+    }
+    .brand h1 { font-size: 17px; font-weight: 600; }
+    .brand p { font-size: 12px; color: var(--muted); }
+    .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .nav-tabs { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .nav-tab {
+      padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      background: transparent; color: var(--muted); border: 1px solid transparent;
+    }
+    .nav-tab:hover:not(:disabled) { color: var(--text); background: var(--panel-2); }
+    .nav-tab.active {
+      background: rgba(16, 185, 129, 0.16); color: #6ee7b7;
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 500;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      background: rgba(251, 191, 36, 0.12); color: #fcd34d;
+    }
+    .badge.ready {
+      border-color: rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.14); color: #6ee7b7;
+    }
+    .badge.fallback {
+      border-color: var(--border-2);
+      background: var(--panel-2); color: #cbd5e1;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 999px; background: currentColor; }
+    button {
+      font-family: inherit; cursor: pointer; border: none; color: var(--text);
+      transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .hidden { display: none !important; }
+    .btn-ghost {
+      padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 500;
+      background: var(--panel-2); border: 1px solid var(--border-2);
+    }
+    .btn-ghost:hover:not(:disabled) { background: #334155; }
+
+    .page-container {
+      flex: 1;
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+    .home-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (min-width: 860px) {
+      .home-grid { grid-template-columns: 5fr 7fr; }
+    }
+    .pro-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (min-width: 960px) {
+      .pro-layout { grid-template-columns: 7fr 5fr; }
+    }
+    .arena-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (min-width: 900px) {
+      .arena-grid { grid-template-columns: 7fr 5fr; }
+    }
+
+    /* Pro Players Grid */
+    .pro-banner {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px 16px; border-radius: 12px; margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(56, 189, 248, 0.12));
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .pro-search {
+      width: 100%; padding: 9px 12px; border-radius: 8px; font-size: 13px;
+      background: var(--panel-2); color: var(--text); border: 1px solid var(--border-2);
+      font-family: inherit; margin-bottom: 12px;
+    }
+    .pro-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      max-height: 560px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .pro-card {
+      background: rgba(2, 6, 23, 0.78);
+      border: 1px solid var(--border-2);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .pro-card:hover { border-color: var(--accent); background: rgba(16, 185, 129, 0.08); }
+    .pro-card.selected {
+      border-color: var(--accent);
+      background: rgba(16, 185, 129, 0.16);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .pro-avatar-lg { width: 64px; height: 64px; border-radius: 999px; overflow: hidden; flex-shrink: 0; }
+    .pro-avatar-sm { width: 30px; height: 30px; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+    .pro-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .pro-tag { font-size: 11px; color: var(--muted); }
+    .elo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .elo-chip {
+      padding: 7px 4px; border-radius: 7px; font-size: 12px; font-weight: 700;
+      background: var(--panel-2); color: #cbd5e1; border: 1px solid var(--border-2);
+    }
+    .elo-chip:hover { background: #334155; }
+    .elo-chip.active { background: var(--accent-hover); color: #fff; border-color: var(--accent); }
+
+    .board-col { display: flex; flex-direction: column; align-items: center; width: 100%; }
+    .board-stage {
+      width: 100%; max-width: 556px;
+      display: flex; align-items: stretch; gap: 8px;
+    }
+    .eval-bar-wrap {
+      width: 26px; flex-shrink: 0; border-radius: 8px; overflow: hidden;
+      border: 1px solid var(--border-2); background: #1e293b;
+      position: relative; display: flex; flex-direction: column; justify-content: flex-end; margin: 6px 0;
+    }
+    .eval-bar-wrap.flipped { justify-content: flex-start; }
+    .eval-fill {
+      width: 100%; height: 50%; background: #f8fafc;
+      transition: height 320ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .eval-score-top, .eval-score-bottom {
+      position: absolute; left: 0; right: 0; text-align: center;
+      font-size: 9px; font-weight: 700; padding: 3px 1px;
+      pointer-events: none; letter-spacing: -0.02em;
+    }
+    .eval-score-top { top: 2px; color: #e2e8f0; }
+    .eval-score-bottom { bottom: 2px; color: #0f172a; }
+    .eval-bar-wrap.flipped .eval-score-top { color: #0f172a; }
+    .eval-bar-wrap.flipped .eval-score-bottom { color: #e2e8f0; }
+
+    .board-main { flex: 1; min-width: 0; }
+    .player-bar {
+      width: 100%; max-width: 556px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 2px; gap: 8px;
+    }
+    .player-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .avatar {
+      width: 30px; height: 30px; border-radius: 6px;
+      background: var(--panel-2); border: 1px solid var(--border-2);
+      display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; overflow: hidden;
+    }
+    .avatar.user { background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); }
+    .player-name { font-size: 14px; font-weight: 600; }
+    .player-meta { font-size: 12px; color: var(--muted); }
+    .player-meta.turn { color: #34d399; }
+    .player-meta.thinking { color: var(--amber); }
+
+    .clock-pill {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 15px; font-weight: 700;
+      padding: 5px 10px; border-radius: 8px;
+      background: var(--panel); border: 1px solid var(--border-2);
+      color: var(--muted); flex-shrink: 0;
+    }
+    .clock-pill.active {
+      background: rgba(16, 185, 129, 0.18); border-color: var(--accent); color: #6ee7b7;
+    }
+    .clock-pill.low {
+      background: rgba(244, 63, 94, 0.22); border-color: var(--rose); color: #fda4af;
+    }
+
+    .board-wrap {
+      width: 100%; border-radius: 12px; overflow: hidden;
+      border: 2px solid var(--border); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      position: relative; margin: 6px 0;
+    }
+    .board-grid {
+      display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
+      aspect-ratio: 1 / 1; width: 100%;
+      user-select: none; -webkit-user-select: none; touch-action: manipulation;
+    }
+    .sq {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      padding: 0; border-radius: 0;
+    }
+    .sq:focus { outline: none; }
+    .sq-light { background-color: #eeeed2; }
+    .sq-dark { background-color: #769656; }
+    .sq-selected { background-color: #baca44 !important; }
+    .sq-last-light { background-color: #f6f669; }
+    .sq-last-dark { background-color: #baca2b; }
+    .sq-hint { box-shadow: inset 0 0 0 3px rgba(56, 189, 248, 0.9); }
+    .sq-check {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(circle, rgba(239,68,68,0.9) 0%, rgba(220,38,38,0.55) 60%, transparent 80%);
+    }
+    .legal-dot {
+      position: absolute; width: 30%; height: 30%; border-radius: 9999px;
+      background-color: rgba(15, 23, 42, 0.28); pointer-events: none;
+    }
+    .legal-capture {
+      position: absolute; width: 84%; height: 84%; border-radius: 9999px;
+      border: 4px solid rgba(15, 23, 42, 0.28); pointer-events: none;
+    }
+    .piece-wrap { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .piece-wrap.hidden-for-anim { opacity: 0; }
+    .piece-svg {
+      width: 84%; height: 84%; pointer-events: none;
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.28));
+    }
+    .anim-layer { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+    .arrow-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 12; }
+    .anim-piece {
+      position: absolute; width: 12.5%; height: 12.5%;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 210ms cubic-bezier(0.22, 1, 0.36, 1); will-change: transform;
+    }
+
+    .promo-modal {
+      position: absolute; inset: 0; z-index: 20;
+      background: rgba(2, 6, 23, 0.85);
+      display: flex; align-items: center; justify-content: center; padding: 16px;
+    }
+    .promo-card {
+      background: var(--panel); border: 1px solid var(--border-2);
+      border-radius: 12px; padding: 18px; text-align: center; max-width: 300px; width: 100%;
+    }
+    .promo-card p { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+    .promo-row { display: flex; gap: 8px; justify-content: center; }
+    .promo-choice {
+      width: 56px; height: 56px; border-radius: 8px;
+      background: var(--panel-2); border: 1px solid var(--border-2);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .promo-choice:hover { background: rgba(16, 185, 129, 0.25); border-color: var(--accent); }
+
+    .under-board-panel {
+      width: 100%; max-width: 556px; margin-top: 12px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    .side-col {
+      display: flex; flex-direction: column; gap: 14px;
+      width: 100%; max-width: 556px; margin: 0 auto;
+    }
+    @media (min-width: 900px) { .side-col { max-width: none; } }
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px;
+    }
+    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .card-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+    .card-kicker {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); font-weight: 600; margin-bottom: 4px;
+    }
+    .status-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .status-text { font-size: 15px; font-weight: 600; color: #34d399; }
+    .status-text.warn { color: var(--amber); }
+    .status-text.loss { color: var(--rose); }
+    .eval-pill {
+      font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 6px;
+      background: var(--panel-2); border: 1px solid var(--border-2); color: #f8fafc; white-space: nowrap;
+    }
+
+    .hint-box {
+      display: none; align-items: center; justify-content: space-between; gap: 8px;
+      margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+      background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35);
+      font-size: 13px; color: #7dd3fc;
+    }
+    .hint-box.visible { display: flex; }
+
+    .level-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+    .level-head label { font-size: 14px; font-weight: 600; }
+    .level-pill {
+      font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 6px;
+      background: rgba(16, 185, 129, 0.15); color: #6ee7b7;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+    .level-scale {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--dim); margin-top: 4px;
+    }
+    .sub-label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .btn-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-seg {
+      padding: 9px 10px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      background: var(--panel-2); color: #cbd5e1; border: 1px solid var(--border-2);
+    }
+    .btn-seg:hover:not(:disabled) { background: #334155; }
+    .btn-seg.active { background: var(--accent-hover); color: #fff; border-color: var(--accent); }
+
+    .setup-block { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .select-input, .num-input {
+      width: 100%; padding: 9px 10px; border-radius: 8px; font-size: 13px;
+      background: var(--panel-2); color: var(--text); border: 1px solid var(--border-2);
+      font-family: inherit;
+    }
+    .custom-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+
+    .toggle-list {
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      font-size: 13px; color: #cbd5e1; cursor: pointer;
+    }
+    .toggle-row input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+    .btn-primary {
+      width: 100%; padding: 12px 16px; border-radius: 10px; font-size: 15px; font-weight: 700;
+      background: var(--accent-hover); color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--accent); }
+    .btn-hint {
+      width: 100%; padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      background: rgba(56, 189, 248, 0.16); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .btn-hint:hover:not(:disabled) { background: rgba(56, 189, 248, 0.28); }
+    .btn-review {
+      width: 100%; margin-top: 10px; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;
+      background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.45);
+    }
+    .btn-review:hover:not(:disabled) { background: rgba(168, 85, 247, 0.34); }
+    .btn-danger {
+      width: 100%; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      background: rgba(244, 63, 94, 0.16); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.35);
+    }
+    .btn-danger:hover:not(:disabled) { background: rgba(244, 63, 94, 0.28); }
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+
+    .moves-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .moves-head span:first-child { font-size: 14px; font-weight: 600; }
+    .moves-head span:last-child { font-size: 12px; color: var(--muted); }
+    .preview-banner {
+      display: none; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 6px 10px; border-radius: 8px; margin-bottom: 8px;
+      background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.3);
+      font-size: 12px; color: #fcd34d;
+    }
+    .preview-banner.visible { display: flex; }
+    .move-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+    .nav-btn {
+      padding: 7px 6px; border-radius: 7px; font-size: 13px; font-weight: 700;
+      background: var(--panel-2); color: #cbd5e1; border: 1px solid var(--border-2);
+    }
+    .nav-btn:hover:not(:disabled) { background: #334155; color: #fff; }
+    .move-list {
+      height: 170px; overflow-y: auto; border-radius: 8px;
+      background: rgba(2, 6, 23, 0.75); border: 1px solid var(--border);
+      padding: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px;
+    }
+    .move-row {
+      display: grid; grid-template-columns: 2fr 5fr 5fr;
+      padding: 2px 4px; border-radius: 4px; align-items: center;
+    }
+    .move-num { color: var(--dim); padding: 2px 4px; }
+    .move-cell {
+      padding: 3px 6px; border-radius: 4px; cursor: pointer; text-align: left;
+      background: transparent; font-family: inherit; font-size: 12px;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .move-cell:hover { background: rgba(51, 65, 85, 0.7); }
+    .move-cell.active { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; font-weight: 700; }
+    .move-w { color: var(--text); }
+    .move-b { color: #cbd5e1; }
+    .empty-moves { color: var(--dim); font-style: italic; font-family: inherit; }
+
+    .cls-tag {
+      font-size: 10px; font-weight: 800; padding: 1px 5px; border-radius: 4px;
+      font-family: system-ui, sans-serif;
+    }
+    .cls-brilliant { background: rgba(34, 211, 238, 0.22); color: #22d3ee; }
+    .cls-great     { background: rgba(96, 165, 250, 0.22); color: #60a5fa; }
+    .cls-best      { background: rgba(52, 211, 153, 0.22); color: #34d399; }
+    .cls-good      { background: rgba(163, 230, 53, 0.20); color: #a3e635; }
+    .cls-book      { background: rgba(217, 119, 6, 0.25);  color: #fbbf24; }
+    .cls-miss      { background: rgba(251, 146, 60, 0.22); color: #fb923c; }
+    .cls-mistake   { background: rgba(250, 204, 21, 0.22); color: #facc15; }
+    .cls-blunder   { background: rgba(244, 63, 94, 0.24);  color: #fb7185; }
+
+    .review-callout {
+      padding: 10px 12px; border-radius: 8px;
+      background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-2);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px;
+    }
+    .progress-bar-bg { width: 100%; height: 6px; border-radius: 999px; background: var(--panel-2); overflow: hidden; margin-top: 8px; }
+    .progress-bar-fill { height: 100%; width: 0%; background: #a855f7; transition: width 150ms ease; }
+    .acc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .acc-box {
+      padding: 10px; border-radius: 8px;
+      background: rgba(2, 6, 23, 0.75); border: 1px solid var(--border-2); text-align: center;
+    }
+    .acc-val { font-size: 20px; font-weight: 800; color: #f8fafc; }
+    .acc-lbl { font-size: 11px; color: var(--muted); }
+    .counts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+    .count-chip {
+      padding: 6px 4px; border-radius: 6px; text-align: center;
+      background: rgba(2, 6, 23, 0.75); border: 1px solid var(--border); font-size: 11px;
+    }
+    .count-chip strong { display: block; font-size: 13px; }
+
+    .saved-list {
+      max-height: 440px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .saved-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 10px 12px; border-radius: 8px;
+      background: rgba(2, 6, 23, 0.75); border: 1px solid var(--border-2);
+    }
+    .saved-meta { min-width: 0; }
+    .saved-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .saved-sub { font-size: 11px; color: var(--muted); }
+    .saved-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .res-pill {
+      font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 999px; text-transform: uppercase;
+    }
+    .res-win { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
+    .res-loss { background: rgba(244, 63, 94, 0.18); color: #fda4af; }
+    .res-draw { background: rgba(251, 191, 36, 0.18); color: #fcd34d; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon">♞</span>
+        <div>
+          <h1>Chess Studio</h1>
+          <p id="headerSub">Play Stockfish Bots &amp; 22 Pro Grandmasters</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <nav class="nav-tabs">
+          <button id="navHomeBtn" type="button" class="nav-tab active">🏠 Home</button>
+          <button id="navOnlineBtn" type="button" class="nav-tab">🌐 Play Online</button>
+          <button id="navProBtn" type="button" class="nav-tab">🏆 Pro Players</button>
+          <button id="navArenaBtn" type="button" class="nav-tab hidden">♟ Game Board</button>
+        </nav>
+        <button id="profileBtn" type="button" class="btn-ghost" title="Create or view your Chess ID">👤 Create Chess ID</button>
+        <span id="engineBadge" class="badge">
+          <span class="dot"></span>
+          Connecting Stockfish…
+        </span>
+        <button id="muteBtn" type="button" class="btn-ghost" title="Toggle sound">🔊 Sound On</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PLAYER ID / PROFILE MODAL -->
+  <div id="profileModal" class="promo-modal hidden" style="position:fixed;inset:0;z-index:50;">
+    <div class="promo-card" style="max-width:400px;text-align:left;">
+      <div class="moves-head" style="margin-bottom:10px;">
+        <span id="profileModalTitle" style="font-size:16px;font-weight:700;">Create Your Chess ID</span>
+        <button id="closeProfileModalBtn" type="button" class="btn-ghost" style="padding:3px 8px;">✕</button>
+      </div>
+      <div id="profileStatsRow" class="acc-grid hidden" style="margin-bottom:12px;margin-top:0;">
+        <div class="acc-box">
+          <div id="profRatingVal" class="acc-val">1200</div>
+          <div class="acc-lbl">Chess Studio Elo</div>
+        </div>
+        <div class="acc-box">
+          <div id="profRecordVal" class="acc-val" style="font-size:16px;">0W / 0L / 0D</div>
+          <div class="acc-lbl">Match Record</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <label for="profUsername" class="sub-label">Unique Username (letters, numbers, _ or - only)</label>
+          <input id="profUsername" type="text" maxlength="20" class="num-input" placeholder="Enter your username" />
+        </div>
+        <div class="custom-time-row" style="margin-top:0;">
+          <div>
+            <label for="profCountry" class="sub-label">Country</label>
+            <select id="profCountry" class="select-input">
+              <option value="🇮🇳">🇮🇳 India</option>
+              <option value="🇺🇸">🇺🇸 USA</option>
+              <option value="🇳🇴">🇳🇴 Norway</option>
+              <option value="🇬🇧">🇬🇧 UK</option>
+              <option value="🇫🇷">🇫🇷 France</option>
+              <option value="🇩🇪">🇩🇪 Germany</option>
+              <option value="🌍">🌍 World</option>
+            </select>
+          </div>
+          <div>
+            <label for="profAvatarIcon" class="sub-label">Avatar Icon</label>
+            <select id="profAvatarIcon" class="select-input">
+              <option value="♞">♞ Knight</option>
+              <option value="♚">♚ King</option>
+              <option value="♛">♛ Queen</option>
+              <option value="♜">♜ Rook</option>
+              <option value="⚡">⚡ Blitz</option>
+              <option value="🔥">🔥 Tactician</option>
+            </select>
+          </div>
+        </div>
+        <div id="profError" style="font-size:12px;color:#fb7185;display:none;"></div><div id="profSuggestRow" style="display:none;gap:6px;flex-wrap:wrap;"></div>
+        <button id="saveProfileBtn" type="button" class="btn-primary">Save Chess ID</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PAGE 1: HOME / LOBBY PAGE -->
+  <section id="homePage" class="page-container">
+    <div class="pro-banner">
+      <div>
+        <div style="font-size:15px;font-weight:700;">🏆 Challenge Professional Chess Players</div>
+        <div style="font-size:12px;color:var(--muted);">Play Magnus, Hikaru, Fabiano, Gukesh, Praggnanandhaa, Anand, Kasparov, Tal &amp; 14 more legends across 8 Elo tiers (1400–2800).</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;"><button id="openOnlinePageBtn" type="button" class="btn-primary" style="width:auto;white-space:nowrap;background:#2563eb;">🌐 Play Online</button><button id="openProPageBtn" type="button" class="btn-primary" style="width:auto;white-space:nowrap;">Explore 22 Pro Bots →</button></div>
+    </div>
+
+    <div class="home-grid">
+      <!-- Standard Stockfish Bot Setup Card -->
+      <div class="card">
+        <h2 class="card-title">Play Standard Stockfish</h2>
+        <p class="card-sub">Choose your Stockfish bot level (1–15), side, timer, and assists.</p>
+
+        <div class="level-head">
+          <label for="levelSlider">Bot Strength</label>
+          <span id="levelLabel" class="level-pill">Level 5 (~1400 Elo)</span>
+        </div>
+        <input id="levelSlider" type="range" min="1" max="15" value="5" />
+        <div class="level-scale">
+          <span>1 (500 Elo)</span>
+          <span>7 (1700 Elo)</span>
+          <span>15 (2900+ Elo)</span>
+        </div>
+
+        <div class="setup-block">
+          <span class="sub-label">Play As</span>
+          <div class="btn-pair">
+            <button id="playWhiteBtn" type="button" class="btn-seg active">♔ White</button>
+            <button id="playBlackBtn" type="button" class="btn-seg">♚ Black</button>
+          </div>
+        </div>
+
+        <div class="setup-block">
+          <label for="timeSelect" class="sub-label">Time Control (Each Side)</label>
+          <select id="timeSelect" class="select-input">
+            <option value="none">No Timer (Unlimited)</option>
+            <option value="1|0">1 min (Bullet)</option>
+            <option value="3|0">3 min (Blitz)</option>
+            <option value="3|2">3 min + 2s (Blitz)</option>
+            <option value="5|0">5 min (Blitz)</option>
+            <option value="10|0" selected>10 min (Rapid)</option>
+            <option value="15|10">15 min + 10s (Rapid)</option>
+            <option value="custom">Custom Timer…</option>
+          </select>
+          <div id="customTimeRow" class="custom-time-row hidden">
+            <div>
+              <label for="customMinInput" class="sub-label">Minutes (1–180)</label>
+              <input id="customMinInput" type="number" min="1" max="180" value="10" class="num-input" />
+            </div>
+            <div>
+              <label for="customIncInput" class="sub-label">Increment (sec)</label>
+              <input id="customIncInput" type="number" min="0" max="60" value="0" class="num-input" />
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-list">
+          <label class="toggle-row">
+            <span>📊 Activate Live Evaluation Bar</span>
+            <input id="toggleEvalChk" type="checkbox" />
+          </label>
+          <label class="toggle-row">
+            <span>💡 Activate Best Move Suggest</span>
+            <input id="toggleSuggestChk" type="checkbox" />
+          </label>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button id="playBtn" type="button" class="btn-primary">▶ Play vs Level 5 (~1400 Elo)</button>
+        </div>
+      </div>
+
+      <!-- Saved Game History Card -->
+      <div class="card">
+        <div class="moves-head">
+          <span style="font-size:16px;font-weight:700;">Saved Game History</span>
+          <span id="savedCount">0 games</span>
+        </div>
+        <p class="card-sub" style="margin-bottom:12px;">Every finished or resigned game is saved here permanently so you can open and review it anytime.</p>
+        <div id="savedList" class="saved-list">
+          <div class="empty-moves">Finish or resign a game to save it here forever for review.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: PLAY ONLINE -->
+  <section id="onlinePage" class="page-container hidden">
+    <div class="home-grid">
+      <div class="card">
+        <h2 class="card-title">🌐 Play Online (Rated)</h2>
+        <p class="card-sub">Choose Bullet, Blitz, or Rapid. Your piece color (White or Black) is assigned 100% randomly at match start—only online games affect your Chess ID Elo.</p>
+
+        <div id="onlineNeedIdBox" class="hidden" style="padding:12px;border-radius:8px;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.35);margin-bottom:14px;">
+          <div style="font-size:13px;color:#fcd34d;margin-bottom:8px;">Create a Chess ID first to play rated online matches!</div>
+          <button id="onlineCreateIdBtn" type="button" class="btn-primary" style="padding:8px 12px;font-size:13px;">👤 Create Chess ID</button>
+        </div>
+
+        <div class="setup-block" style="margin-top:0;padding-top:0;border-top:none;">
+          <span class="sub-label">⚡ Bullet</span>
+          <div class="elo-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">
+            <button type="button" data-online-tc="1|0" class="elo-chip online-tc-btn">1 min</button>
+            <button type="button" data-online-tc="1|1" class="elo-chip online-tc-btn">1 | 1</button>
+            <button type="button" data-online-tc="2|1" class="elo-chip online-tc-btn">2 | 1</button>
+          </div>
+          <span class="sub-label">🔥 Blitz</span>
+          <div class="elo-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">
+            <button type="button" data-online-tc="3|0" class="elo-chip online-tc-btn">3 min</button>
+            <button type="button" data-online-tc="3|2" class="elo-chip online-tc-btn active">3 | 2</button>
+            <button type="button" data-online-tc="5|0" class="elo-chip online-tc-btn">5 min</button>
+          </div>
+          <span class="sub-label">⏱ Rapid</span>
+          <div class="elo-grid" style="grid-template-columns:repeat(3,1fr);">
+            <button type="button" data-online-tc="10|0" class="elo-chip online-tc-btn">10 min</button>
+            <button type="button" data-online-tc="15|10" class="elo-chip online-tc-btn">15 | 10</button>
+            <button type="button" data-online-tc="30|0" class="elo-chip online-tc-btn">30 min</button>
+          </div>
+        </div>
+
+        <div class="setup-block">
+          <span class="sub-label">Piece Color</span>
+          <div style="padding:9px 12px;border-radius:8px;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.3);font-size:13px;color:#7dd3fc;">
+            🎲 Full Random (50/50 White or Black — hidden until match starts)
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button id="findOnlineBtn" type="button" class="btn-primary" style="background:#2563eb;">🔍 Find Online Match (3 | 2)</button>
+        </div>
+        <div id="onlineSearchStatus" class="hidden" style="margin-top:10px;font-size:13px;color:#fcd34d;text-align:center;">Searching for an opponent near your Elo…</div>
+      </div>
+
+      <div class="card">
+        <div class="moves-head" style="margin-bottom:8px;">
+          <span style="font-size:16px;font-weight:700;">Live Multiplayer Server</span>
+          <span id="fbStatusBadge" class="badge ready">Live Firebase Connected</span>
+        </div>
+        <p class="card-sub" style="margin-bottom:12px;">Your app is connected to the live multiplayer server. Players are matched in real time with random White/Black colors.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:#cbd5e1;">
+          <div>• <strong>Elo Protection:</strong> Playing Standard Stockfish or the 22 Pro Player bots never changes your Chess ID Elo.</div>
+          <div>• <strong>Rated Matches:</strong> Online matches update your Chess ID Elo and W/L/D record upon completion.</div>
+          <div>• <strong>Fair Random Color:</strong> Color is rolled randomly when your opponent is found so neither player knows in advance.</div>
+        </div>
+        <div id="fbMsg" style="font-size:12px;color:#6ee7b7;margin-top:10px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 2: PROFESSIONAL PLAYERS PAGE -->
+  <section id="proPage" class="page-container hidden">
+    <div class="pro-layout">
+      <!-- Left: 22 Pro Player Cards -->
+      <div class="card">
+        <div class="moves-head">
+          <span style="font-size:16px;font-weight:700;">Professional Players (22 GMs)</span>
+          <span id="proCountLabel">22 players</span>
+        </div>
+        <p class="card-sub" style="margin-bottom:10px;">Select a Grandmaster to play their signature openings and style across 8 Elo variants.</p>
+        <input id="proSearchInput" type="search" class="pro-search" placeholder="Search player (e.g., Magnus, Hikaru, Gukesh, Tal)…" />
+        <div id="proGrid" class="pro-grid"></div>
+      </div>
+
+      <!-- Right: Selected Pro Match Setup -->
+      <div class="card" id="proSetupCard">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div id="proSelectedAvatar" class="pro-avatar-lg"></div>
+          <div>
+            <div id="proSelectedName" style="font-size:17px;font-weight:700;">Magnus Carlsen</div>
+            <div id="proSelectedMeta" style="font-size:12px;color:var(--muted);">🇳🇴 World Champion · Universal &amp; Endgame Grinder</div>
+          </div>
+        </div>
+        <p id="proSelectedBio" style="font-size:12px;color:#cbd5e1;margin-bottom:14px;">Plays Ruy Lopez, Queen's Gambit, and squeezes tiny advantages into endgame wins.</p>
+
+        <div class="setup-block" style="margin-top:0;padding-top:0;border-top:none;">
+          <span class="sub-label">Choose Elo Variant (8 Tiers)</span>
+          <div id="proEloGrid" class="elo-grid"></div>
+        </div>
+
+        <div class="setup-block">
+          <span class="sub-label">Play As</span>
+          <div class="btn-pair">
+            <button id="proWhiteBtn" type="button" class="btn-seg active">♔ White</button>
+            <button id="proBlackBtn" type="button" class="btn-seg">♚ Black</button>
+          </div>
+        </div>
+
+        <div class="setup-block">
+          <label for="proTimeSelect" class="sub-label">Time Control (Each Side)</label>
+          <select id="proTimeSelect" class="select-input">
+            <option value="none">No Timer (Unlimited)</option>
+            <option value="1|0">1 min (Bullet)</option>
+            <option value="3|0">3 min (Blitz)</option>
+            <option value="3|2">3 min + 2s (Blitz)</option>
+            <option value="5|0">5 min (Blitz)</option>
+            <option value="10|0" selected>10 min (Rapid)</option>
+            <option value="15|10">15 min + 10s (Rapid)</option>
+            <option value="custom">Custom Timer…</option>
+          </select>
+          <div id="proCustomTimeRow" class="custom-time-row hidden">
+            <div>
+              <label for="proCustomMinInput" class="sub-label">Minutes (1–180)</label>
+              <input id="proCustomMinInput" type="number" min="1" max="180" value="10" class="num-input" />
+            </div>
+            <div>
+              <label for="proCustomIncInput" class="sub-label">Increment (sec)</label>
+              <input id="proCustomIncInput" type="number" min="0" max="60" value="0" class="num-input" />
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-list">
+          <label class="toggle-row">
+            <span>📊 Activate Live Evaluation Bar</span>
+            <input id="proToggleEvalChk" type="checkbox" />
+          </label>
+          <label class="toggle-row">
+            <span>💡 Activate Best Move Suggest</span>
+            <input id="proToggleSuggestChk" type="checkbox" />
+          </label>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button id="proStartBtn" type="button" class="btn-primary">▶ Play vs Magnus Carlsen (2000 Elo)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 3: GAME ARENA / REVIEW PAGE -->
+  <section id="arenaPage" class="page-container hidden">
+    <div class="arena-grid">
+      <div class="board-col">
+        <div class="player-bar">
+          <div class="player-info">
+            <span id="topAvatar" class="avatar">🤖</span>
+            <div>
+              <div id="topName" class="player-name">Stockfish Bot — Level 5 (Black)</div>
+              <div id="topMeta" class="player-meta">Strength ~1400</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div id="topCaptured" class="player-meta"></div>
+            <div id="topClock" class="clock-pill hidden">10:00</div>
+          </div>
+        </div>
+
+        <div class="board-stage">
+          <div id="evalBar" class="eval-bar-wrap hidden" title="Stockfish Position Evaluation">
+            <div id="evalFill" class="eval-fill"></div>
+            <span id="evalTopText" class="eval-score-top"></span>
+            <span id="evalBottomText" class="eval-score-bottom">0.0</span>
+          </div>
+
+          <div class="board-main">
+            <div class="board-wrap">
+              <div id="board" class="board-grid"></div>
+              <svg id="arrowLayer" class="arrow-layer" viewBox="0 0 800 800" preserveAspectRatio="none"></svg>
+              <div id="animLayer" class="anim-layer"></div>
+
+              <div id="promoModal" class="promo-modal hidden">
+                <div class="promo-card">
+                  <p>Promote Pawn To</p>
+                  <div class="promo-row">
+                    <button data-piece="q" type="button" class="promo-choice"></button>
+                    <button data-piece="r" type="button" class="promo-choice"></button>
+                    <button data-piece="b" type="button" class="promo-choice"></button>
+                    <button data-piece="n" type="button" class="promo-choice"></button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="resignModal" class="promo-modal hidden">
+                <div class="promo-card">
+                  <p>Are you sure you want to resign this match?</p>
+                  <div class="action-row" style="margin-top:8px;">
+                    <button id="confirmResignBtn" type="button" class="btn-danger">Yes, Resign</button>
+                    <button id="cancelResignBtn" type="button" class="btn-seg">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-bar">
+          <div class="player-info">
+            <span id="bottomAvatar" class="avatar user">👤</span>
+            <div>
+              <div id="bottomName" class="player-name">You (White)</div>
+              <div id="bottomMeta" class="player-meta">Your turn</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div id="bottomCaptured" class="player-meta"></div>
+            <div id="bottomClock" class="clock-pill hidden">10:00</div>
+          </div>
+        </div>
+
+        <div id="underBoardPanel" class="under-board-panel hidden">
+          <div id="moveCallout" class="review-callout hidden">
+            <div id="calloutLeft"></div>
+            <div id="calloutRight" style="font-size:12px;color:var(--muted);"></div>
+          </div>
+
+          <div class="card" style="padding:14px;">
+            <div class="moves-head">
+              <span id="movesHeading">Move History &amp; Preview</span>
+              <span id="moveCount">0 moves</span>
+            </div>
+            <div id="previewBanner" class="preview-banner">
+              <span id="previewText">Previewing move 1</span>
+              <button id="backToLiveBtn" type="button" class="btn-ghost" style="padding:3px 8px;">Go to Live &gt;|</button>
+            </div>
+            <div class="move-nav">
+              <button id="navFirstBtn" type="button" class="nav-btn" title="Start position">|&lt;</button>
+              <button id="navPrevBtn" type="button" class="nav-btn" title="Previous move">&lt;</button>
+              <button id="navNextBtn" type="button" class="nav-btn" title="Next move">&gt;</button>
+              <button id="navLastBtn" type="button" class="nav-btn" title="Latest / Live move">&gt;|</button>
+            </div>
+            <div id="moveList" class="move-list">
+              <div class="empty-moves">No moves yet. Make your opening move!</div>
+            </div>
+          </div>
+
+          <button id="resignBtn" type="button" class="btn-danger hidden">🏳 Resign</button>
+        </div>
+      </div>
+
+      <aside class="side-col">
+        <div id="statusBox" class="card">
+          <div class="card-kicker">Match Status</div>
+          <div class="status-row">
+            <div id="statusText" class="status-text">White to move — your turn</div>
+            <span id="evalPill" class="eval-pill hidden">Eval: 0.0</span>
+          </div>
+          <div id="hintBox" class="hint-box">
+            <span id="hintText">Best Move: —</span>
+            <button id="clearHintBtn" type="button" class="btn-ghost" style="padding:2px 8px;">Hide</button>
+          </div>
+
+          <button id="runReviewBtn" type="button" class="btn-review hidden">🔍 Run Full Game Review</button>
+          <div id="reviewProgressWrap" class="hidden" style="margin-top:10px;">
+            <div id="reviewProgressText" style="font-size:12px;color:#d8b4fe;">Analyzing moves…</div>
+            <div class="progress-bar-bg"><div id="reviewProgressBar" class="progress-bar-fill"></div></div>
+          </div>
+        </div>
+
+        <div id="reviewSummaryCard" class="card hidden">
+          <div class="moves-head" style="margin-bottom:4px;">
+            <span>Game Review Summary</span>
+            <span style="font-size:11px;color:#d8b4fe;">Stockfish Analysis</span>
+          </div>
+          <div class="acc-grid">
+            <div class="acc-box">
+              <div id="whiteAccVal" class="acc-val">—</div>
+              <div class="acc-lbl">White Accuracy</div>
+            </div>
+            <div class="acc-box">
+              <div id="blackAccVal" class="acc-val">—</div>
+              <div class="acc-lbl">Black Accuracy</div>
+            </div>
+          </div>
+          <div id="reviewCountsGrid" class="counts-grid"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-kicker" style="margin-bottom:10px;">Board &amp; Match Controls</div>
+          <div class="btn-pair">
+            <button id="undoBtn" type="button" class="btn-seg">↩ Undo</button>
+            <button id="flipBtn" type="button" class="btn-seg">⇅ Flip Board</button>
+          </div>
+
+          <button id="suggestBtn" type="button" class="btn-hint hidden" style="margin-top:10px;" disabled>💡 Suggest Best Move</button>
+
+          <div class="action-row">
+            <button id="newGameBtn" type="button" class="btn-seg">↻ New Match</button>
+            <button id="backHomeBtn" type="button" class="btn-seg">🏠 Back to Home</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.14.1/firebase-app-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.14.1/firebase-database-compat.js"></script>
+  <script>
+    const PIECE_SVGS = {
+      wp: '<svg viewBox="0 0 45 45" class="piece-svg"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linecap="round"/></svg>',
+      bp: '<svg viewBox="0 0 45 45" class="piece-svg"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#1e293b" stroke="#020617" stroke-width="1.6" stroke-linecap="round"/></svg>',
+      wr: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#fff" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 39h27v-3H9v3zM12 36v-4h21v4H12zM11 14V9h4v2h5V9h5v2h5V9h4v5"/><path d="M34 14l-3 3H14l-3-3"/><path d="M31 17v12.5H14V17"/><path d="M31 29.5l1.5 2.5h-20l1.5-2.5"/><path d="M11 14h23" fill="none"/></g></svg>',
+      br: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#1e293b" stroke="#020617" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 39h27v-3H9v3zM12.5 32l1.5-2.5h17l1.5 2.5h-20zM12 36v-4h21v4H12z"/><path d="M14 29.5v-13h17v13H14z"/><path d="M14 16.5L11 14h23l-3 2.5H14zM11 14V9h4v2h5V9h5v2h5V9h4v5H11z"/><path d="M12 35.5h21M13 31.5h19M14 29.5h17M14 16.5h17M11 14h23" fill="none" stroke="#cbd5e1" stroke-width="1"/></g></svg>',
+      wn: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#fff" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21"/><path d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4.003 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-.994-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-1.992 2.5-3c1 0 1 3 1 3"/><circle cx="15" cy="15.5" r="1" fill="#111"/></g></svg>',
+      bn: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#1e293b" stroke="#020617" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21"/><path d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4.003 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-.994-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-1.992 2.5-3c1 0 1 3 1 3"/><circle cx="15" cy="15.5" r="1" fill="#cbd5e1"/></g></svg>',
+      wb: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#fff" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><circle cx="22.5" cy="8" r="2.5"/><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" fill="none"/></g></svg>',
+      bb: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#1e293b" stroke="#020617" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><circle cx="22.5" cy="8" r="2.5"/><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" fill="none" stroke="#cbd5e1"/></g></svg>',
+      wq: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#fff" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.75"/><circle cx="14" cy="9" r="2.75"/><circle cx="22.5" cy="8" r="2.75"/><circle cx="31" cy="9" r="2.75"/><circle cx="39" cy="12" r="2.75"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-13.5V25L7 14l2 12z"/><path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/></g></svg>',
+      bq: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#1e293b" stroke="#020617" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.75"/><circle cx="14" cy="9" r="2.75"/><circle cx="22.5" cy="8" r="2.75"/><circle cx="31" cy="9" r="2.75"/><circle cx="39" cy="12" r="2.75"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-13.5V25L7 14l2 12z"/><path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path d="M11 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0" fill="none" stroke="#cbd5e1" stroke-width="1"/></g></svg>',
+      wk: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#fff" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 11.63V6M20 8h5" fill="none"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0" fill="none"/></g></svg>',
+      bk: '<svg viewBox="0 0 45 45" class="piece-svg"><g fill="#1e293b" stroke="#020617" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 11.63V6M20 8h5" fill="none" stroke="#cbd5e1"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0" fill="none" stroke="#cbd5e1" stroke-width="1"/></g></svg>'
+    };
+
+    const BOT_LEVELS = {
+      1:  { skill: 0,  depth: 2,  movetime: 100,  multipv: 5, blunderChance: 0.25, maxCpLoss: 300, bestBias: 0.25, elo: '~500' },
+      2:  { skill: 1,  depth: 3,  movetime: 120,  multipv: 5, blunderChance: 0.14, maxCpLoss: 220, bestBias: 0.35, elo: '~750' },
+      3:  { skill: 3,  depth: 3,  movetime: 140,  multipv: 5, blunderChance: 0.05, maxCpLoss: 150, bestBias: 0.45, elo: '~1000' },
+      4:  { skill: 5,  depth: 4,  movetime: 180,  multipv: 4, blunderChance: 0.0,  maxCpLoss: 105, bestBias: 0.55, elo: '~1200' },
+      5:  { skill: 7,  depth: 5,  movetime: 220,  multipv: 4, blunderChance: 0.0,  maxCpLoss: 75,  bestBias: 0.65, elo: '~1400' },
+      6:  { skill: 9,  depth: 6,  movetime: 260,  multipv: 4, blunderChance: 0.0,  maxCpLoss: 55,  bestBias: 0.72, elo: '~1550' },
+      7:  { skill: 11, depth: 7,  movetime: 300,  multipv: 3, blunderChance: 0.0,  maxCpLoss: 42,  bestBias: 0.78, elo: '~1700' },
+      8:  { skill: 13, depth: 8,  movetime: 360,  multipv: 3, blunderChance: 0.0,  maxCpLoss: 30,  bestBias: 0.84, elo: '~1850' },
+      9:  { skill: 15, depth: 9,  movetime: 420,  multipv: 3, blunderChance: 0.0,  maxCpLoss: 22,  bestBias: 0.88, elo: '~2000' },
+      10: { skill: 17, depth: 10, movetime: 500,  multipv: 2, blunderChance: 0.0,  maxCpLoss: 15,  bestBias: 0.92, elo: '~2150' },
+      11: { skill: 18, depth: 11, movetime: 620,  multipv: 2, blunderChance: 0.0,  maxCpLoss: 8,   bestBias: 0.96, elo: '~2300' },
+      12: { skill: 19, depth: 12, movetime: 750,  multipv: 1, blunderChance: 0.0,  maxCpLoss: 0,   bestBias: 1.0,  elo: '~2450' },
+      13: { skill: 20, depth: 13, movetime: 900,  multipv: 1, blunderChance: 0.0,  maxCpLoss: 0,   bestBias: 1.0,  elo: '~2600' },
+      14: { skill: 20, depth: 15, movetime: 1150, multipv: 1, blunderChance: 0.0,  maxCpLoss: 0,   bestBias: 1.0,  elo: '~2750' },
+      15: { skill: 20, depth: 17, movetime: 1450, multipv: 1, blunderChance: 0.0,  maxCpLoss: 0,   bestBias: 1.0,  elo: '~2900+' }
+    };
+
+    // 8 Elo Variants for every Pro Player
+    const PRO_ELO_VARIANTS = [1400, 1600, 1900, 2000, 2300, 2500, 2700, 2800];
+    const PRO_ELO_CONFIGS = {
+      1400: { skill: 7,  depth: 5,  movetime: 220,  multipv: 4, blunderChance: 0.0, maxCpLoss: 75, bestBias: 0.65 },
+      1600: { skill: 9,  depth: 6,  movetime: 260,  multipv: 4, blunderChance: 0.0, maxCpLoss: 50, bestBias: 0.74 },
+      1900: { skill: 13, depth: 8,  movetime: 360,  multipv: 3, blunderChance: 0.0, maxCpLoss: 28, bestBias: 0.85 },
+      2000: { skill: 15, depth: 9,  movetime: 420,  multipv: 3, blunderChance: 0.0, maxCpLoss: 20, bestBias: 0.89 },
+      2300: { skill: 18, depth: 11, movetime: 620,  multipv: 2, blunderChance: 0.0, maxCpLoss: 8,  bestBias: 0.96 },
+      2500: { skill: 19, depth: 12, movetime: 780,  multipv: 1, blunderChance: 0.0, maxCpLoss: 0,  bestBias: 1.0 },
+      2700: { skill: 20, depth: 14, movetime: 1050, multipv: 1, blunderChance: 0.0, maxCpLoss: 0,  bestBias: 1.0 },
+      2800: { skill: 20, depth: 16, movetime: 1350, multipv: 1, blunderChance: 0.0, maxCpLoss: 0,  bestBias: 1.0 }
+    };
+
+    // 22 Notable Chess Players with Cartoon Avatar Traits & Signature Openings
+    const PRO_PLAYERS = [
+      { id:'magnus',  name:'Magnus Carlsen',      flag:'🇳🇴', style:'Universal & Endgame Grinder', bio:'Squeezes tiny positional edges and excels in Ruy Lopez, Italian, and Queen\'s Gambit.', bg:'#1e3a8a', skin:'#f3c6a5', hair:'#5c4033', hairStyle:'wavy', beard:'stubble', glasses:false, openings:[['e4','e5','Nf3','Nc6','Bb5'],['d4','d5','c4','e6']] },
+      { id:'hikaru',  name:'Hikaru Nakamura',     flag:'🇺🇸', style:'Dynamic Speedster',         bio:'Loves tricky sidelines, King\'s Indian setups, and relentless tactical pressure.',        bg:'#312e81', skin:'#e8b896', hair:'#18181b', hairStyle:'short', beard:'goatee',  glasses:false, openings:[['e4','c5','Nf3','d6'],['Nf3','d5','g3']] },
+      { id:'fabiano', name:'Fabiano Caruana',     flag:'🇺🇸', style:'Deep Opening Theorist',     bio:'Prepares razor-sharp theoretical lines in the Petroff, Ruy Lopez, and QGD.',            bg:'#0f766e', skin:'#ecc0a1', hair:'#27272a', hairStyle:'parted', beard:'none',   glasses:true,  openings:[['e4','e5','Nf3','Nf6'],['d4','d5','c4','e6']] },
+      { id:'gukesh',  name:'Gukesh D',            flag:'🇮🇳', style:'Fearless Calculator',       bio:'World Champion known for deep, concrete calculation and sharp middlegame battles.',     bg:'#b45309', skin:'#c68b59', hair:'#111827', hairStyle:'neat',   beard:'none',    glasses:false, openings:[['e4','e5','Nf3','Nc6','Bc4'],['d4','Nf6','c4','e6']] },
+      { id:'pragg',   name:'R Praggnanandhaa',    flag:'🇮🇳', style:'Tactical Prodigy',          bio:'Sharp, resilient, and dangerous in Sicilian, Nimzo-Indian, and Ruy Lopez lines.',       bg:'#047857', skin:'#b87a4b', hair:'#111827', hairStyle:'short',  beard:'none',    glasses:false, openings:[['e4','c5','Nf3','Nc6'],['d4','Nf6','c4','e6']] },
+      { id:'anand',   name:'Viswanathan Anand',   flag:'🇮🇳', style:'Lightning Intuition',       bio:'Five-time World Champion famed for rapid calculation and classical 1.e4 play.',         bg:'#7c2d12', skin:'#be8254', hair:'#374151', hairStyle:'parted', beard:'none',    glasses:true,  openings:[['e4','e5','Nf3','Nc6','Bb5'],['e4','c5','Nf3','d6']] },
+      { id:'kasparov',name:'Garry Kasparov',      flag:'🇷🇺', style:'Relentless Attacker',       bio:'Dominates with dynamic piece activity, Najdorf Sicilian, and King\'s Indian Defense.', bg:'#7f1d1d', skin:'#f0c2a0', hair:'#4b5563', hairStyle:'curly',  beard:'none',    glasses:false, openings:[['d4','Nf6','c4','g6'],['e4','c5','Nf3','d6']] },
+      { id:'fischer', name:'Bobby Fischer',       flag:'🇺🇸', style:'Crystal-Clear Precision',   bio:'Classical 1.e4 specialist who crushes with active pieces and the Najdorf.',            bg:'#1d4ed8', skin:'#f5cbb0', hair:'#4a3728', hairStyle:'parted', beard:'none',    glasses:false, openings:[['e4','c5','Nf3','d6'],['e4','e5','Nf3','Nc6','Bb5']] },
+      { id:'tal',     name:'Mikhail Tal',         flag:'🇱🇻', style:'Magician of Sacrifices',    bio:'Seeks wild complications, piece sacrifices, and direct kingside attacks.',              bg:'#991b1b', skin:'#ecc2a6', hair:'#1f2937', hairStyle:'curly',  beard:'none',    glasses:false, openings:[['e4','c5','Nf3','Nc6'],['e4','e5','f4','exd4']] },
+      { id:'karpov',  name:'Anatoly Karpov',      flag:'🇷🇺', style:'Boa Constrictor',           bio:'Patiently restricts opponent counterplay with 1.d4, Caro-Kann, and prophylaxis.',       bg:'#334155', skin:'#f4ccb1', hair:'#6b4f3b', hairStyle:'neat',   beard:'none',    glasses:false, openings:[['d4','d5','c4','e6'],['e4','c6','d4','d5']] },
+      { id:'capa',    name:'José Raúl Capablanca',flag:'🇨🇺', style:'Effortless Technique',      bio:'Legendary endgame virtuoso who favors clean structures and simple, strong moves.',       bg:'#0369a1', skin:'#e8b998', hair:'#1f2937', hairStyle:'slick',  beard:'none',    glasses:false, openings:[['d4','d5','c4','e6'],['e4','e5','Nf3','Nc6']] },
+      { id:'alekhine',name:'Alexander Alekhine',  flag:'🇷🇺', style:'Fierce Combinationalist',   bio:'Creates complex tactical storms and attacks from unexpected angles.',                   bg:'#4c1d95', skin:'#f1c7aa', hair:'#78350f', hairStyle:'parted', beard:'none',    glasses:false, openings:[['d4','d5','c4','c6'],['e4','Nf6']] },
+      { id:'nepo',    name:'Ian Nepomniachtchi',  flag:'🇷🇺', style:'Instinctive Tactician',     bio:'Plays fast, aggressive chess with Ruy Lopez, Petroff, and sharp Sicilian lines.',       bg:'#3f6212', skin:'#f3c7aa', hair:'#3f2e21', hairStyle:'wavy',   beard:'short',   glasses:false, openings:[['e4','e5','Nf3','Nc6','Bb5'],['e4','c5','Nf3','d6']] },
+      { id:'ding',    name:'Ding Liren',          flag:'🇨🇳', style:'Solid & Resilient',         bio:'Calm defensive mastery combined with deep Catalan and English Opening prep.',           bg:'#155e75', skin:'#ecc19e', hair:'#111827', hairStyle:'neat',   beard:'none',    glasses:false, openings:[['d4','Nf6','c4','e6'],['c4','e5']] },
+      { id:'alireza', name:'Alireza Firouzja',    flag:'🇫🇷', style:'Creative Genius',           bio:'Fearless attacking flair in the French, Caro-Kann, and Italian Game.',                  bg:'#6d28d9', skin:'#e7b99a', hair:'#18181b', hairStyle:'wavy',   beard:'stubble', glasses:false, openings:[['e4','e6','d4','d5'],['e4','e5','Nf3','Nc6','Bc4']] },
+      { id:'wesley',  name:'Wesley So',           flag:'🇺🇸', style:'Ultra-Solid Positional',    bio:'Rarely blunders; prefers Italian, Ruy Lopez, and clean, balanced structures.',          bg:'#0f766e', skin:'#dfb08c', hair:'#18181b', hairStyle:'short',  beard:'none',    glasses:true,  openings:[['e4','e5','Nf3','Nc6','Bc4'],['d4','d5','c4','e6']] },
+      { id:'mvl',     name:'Maxime Vachier-Lagrave',flag:'🇫🇷',style:'Najdorf & Grünfeld Expert', bio:'Sharpest theoretical specialist in the Sicilian Najdorf and Grünfeld Defense.',        bg:'#1e40af', skin:'#f0c5a8', hair:'#3b2f2f', hairStyle:'short',  beard:'stubble', glasses:true,  openings:[['e4','c5','Nf3','d6'],['d4','Nf6','c4','g6']] },
+      { id:'arjun',   name:'Arjun Erigaisi',      flag:'🇮🇳', style:'Relentless Madman',         bio:'Pushes every position to the limit with aggressive pawn storms and tactics.',           bg:'#9a3412', skin:'#c48757', hair:'#111827', hairStyle:'curly',  beard:'stubble', glasses:false, openings:[['d4','Nf6','c4','e6'],['e4','e5','Nf3','Nc6']] },
+      { id:'nodirbek',name:'Nodirbek Abdusattorov',flag:'🇺🇿',style:'Practical Fighter',         bio:'Thrives in messy, practical middlegames and fast time controls.',                       bg:'#0e7490', skin:'#e8bc99', hair:'#18181b', hairStyle:'neat',   beard:'none',    glasses:false, openings:[['e4','e5','Nf3','Nc6'],['d4','d5','Bf4']] },
+      { id:'polgar',  name:'Judit Polgár',        flag:'🇭🇺', style:'Queen of Attack',           bio:'Greatest female player ever; famous for bold sacrifices and King\'s Indian attacks.',   bg:'#9d174d', skin:'#f5cbb0', hair:'#5c3a21', hairStyle:'long',   beard:'none',    glasses:false, openings:[['e4','c5','Nf3','Nc6'],['e4','e5','Nf3','Nc6','Bc4']] },
+      { id:'aronian', name:'Levon Aronian',       flag:'🇺🇸', style:'Artistic Strategist',       bio:'Inventive middlegame ideas in the Queen\'s Gambit, Marshall, and Catalan.',             bg:'#5b21b6', skin:'#ecc0a3', hair:'#27272a', hairStyle:'slick',  beard:'short',   glasses:false, openings:[['d4','d5','c4','e6'],['c4','e5']] },
+      { id:'kramnik', name:'Vladimir Kramnik',    flag:'🇷🇺', style:'Iron Defense & 1.d4',       bio:'Master of the Berlin Wall, Catalan, and rock-solid strategic control.',                 bg:'#374151', skin:'#f2c8ac', hair:'#4b5563', hairStyle:'short',  beard:'none',    glasses:false, openings:[['d4','Nf6','c4','e6'],['e4','e5','Nf3','Nc6','Bb5','Nf6']] }
+    ];
+
+    const PRO_PHOTOS = {'magnus': 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Magnus_Carlsen_in_2023.jpg', 'hikaru': 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Hikaru_Nakamura_%282016%29_crop.jpg', 'fabiano': 'https://upload.wikimedia.org/wikipedia/commons/7/71/Fabiano_Caruana_in_2023.jpg', 'gukesh': 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Gukesh_in_2025_%28cropped%29.jpg', 'pragg': 'https://upload.wikimedia.org/wikipedia/commons/8/85/Praggnanandhaa_in_2025.jpg', 'anand': 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Viswanathan_Anand_%282016%29.jpeg', 'kasparov': 'https://caspianpost.com/storage/photos/thumbs/large/c3c26a3bb4988ff5401ba14f5580cbc5.webp', 'fischer': 'https://upload.wikimedia.org/wikipedia/commons/3/34/Bobby_Fischer_1972.jpg', 'tal': 'https://upload.wikimedia.org/wikipedia/commons/b/bf/Mikhail_Tal_1982.jpg', 'karpov': 'https://upload.wikimedia.org/wikipedia/commons/6/62/Anatoly_Karpov_1979.jpg', 'capa': 'https://upload.wikimedia.org/wikipedia/commons/0/0f/Jos%C3%A9_Ra%C3%BAl_Capablanca_1921.jpg', 'alekhine': 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Alexandre_Alekhine_Color.jpg', 'nepo': 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Ian_Nepomniachtchi_in_2024.jpg', 'ding': 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Ding_Liren_in_2024.jpg', 'alireza': 'https://upload.wikimedia.org/wikipedia/commons/b/bb/Alireza_Firouzja_in_2024.jpg', 'wesley': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Wesley_So_1%2C_Candidates_Tournament_2018.jpg', 'mvl': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Maxime_Vachier-Lagrave_au_tournoi_des_candidats_%28cropped%29.jpg', 'arjun': 'https://upload.wikimedia.org/wikipedia/commons/0/00/Arjun_Erigaisi_in_2025.jpg', 'nodirbek': 'https://upload.wikimedia.org/wikipedia/commons/1/10/Nodirbek_Abdusattorov_in_2025_%28cropped%29.jpg', 'polgar': 'https://upload.wikimedia.org/wikipedia/commons/2/29/Judit_Polgar.jpg', 'aronian': 'https://upload.wikimedia.org/wikipedia/commons/9/90/Levon_Aronian_in_2023.jpg', 'kramnik': 'https://upload.wikimedia.org/wikipedia/commons/7/76/Vladimir_Kramnik_%28cropped%29.jpg'};
+    function renderProAvatar(p, sizeClass = 'pro-avatar-lg') {
+      const uid = p.id + '_' + sizeClass.replace(/[^a-z]/g, '');
+      const suitColors = {
+        magnus: ['#1e293b', '#38bdf8'],
+        hikaru: ['#111827', '#6366f1'],
+        fabiano: ['#0f172a', '#14b8a6'],
+        gukesh: ['#1e293b', '#f59e0b'],
+        pragg: ['#064e3b', '#34d399'],
+        anand: ['#312e81', '#f97316'],
+        kasparov: ['#1f2937', '#ef4444'],
+        fischer: ['#1e3a8a', '#93c5fd'],
+        tal: ['#18181b', '#f43f5e'],
+        karpov: ['#1e293b', '#94a3b8'],
+        capa: ['#0c4a6e', '#bae6fd'],
+        alekhine: ['#2e1065', '#c084fc'],
+        nepo: ['#1a2e05', '#84cc16'],
+        ding: ['#164e63', '#22d3ee'],
+        alireza: ['#3b0764', '#a855f7'],
+        wesley: ['#134e4a', '#2dd4bf'],
+        mvl: ['#1e3a8a', '#60a5fa'],
+        arjun: ['#431407', '#fb923c'],
+        nodirbek: ['#164e63', '#38bdf8'],
+        polgar: ['#500724', '#f472b6'],
+        aronian: ['#2e1065', '#a78bfa'],
+        kramnik: ['#1f2937', '#cbd5e1']
+      };
+      const [coat, tie] = suitColors[p.id] || ['#1e293b', '#34d399'];
+
+      // Hair back layer (behind head)
+      let hairBack = '';
+      if (p.hairStyle === 'long') {
+        hairBack = `<path d="M18 36c-2-18 46-18 44 0l4 32H14l4-32z" fill="${p.hair}"/>`;
+      } else if (p.hairStyle === 'curly') {
+        hairBack = `<path d="M19 34c-2-16 44-16 42 0 3 6 1 12-3 14H22c-4-2-6-8-3-14z" fill="${p.hair}"/>`;
+      }
+
+      // Hair front layer (sculpted)
+      let hairFront = '';
+      if (p.hairStyle === 'wavy') {
+        hairFront = `
+          <path d="M21 34c0-15 38-17 38 0-3-8-10-12-19-11-9 1-16 4-19 11z" fill="${p.hair}"/>
+          <path d="M23 26c6-6 17-8 28-4-6 3-17 2-28 4z" fill="rgba(255,255,255,0.12)"/>`;
+      } else if (p.hairStyle === 'curly') {
+        hairFront = `
+          <path d="M21 33c-2-13 10-20 19-19 10-1 21 6 19 19-4-6-11-9-19-8-8-1-15 2-19 8z" fill="${p.hair}"/>
+          <circle cx="27" cy="21" r="4.5" fill="${p.hair}"/><circle cx="36" cy="18" r="5" fill="${p.hair}"/><circle cx="46" cy="19" r="5" fill="${p.hair}"/><circle cx="53" cy="23" r="4" fill="${p.hair}"/>`;
+      } else if (p.hairStyle === 'long') {
+        hairFront = `
+          <path d="M20 35c0-16 40-16 40 0-6-9-13-11-20-11s-14 2-20 11z" fill="${p.hair}"/>
+          <path d="M25 23c8-4 22-4 30 0" stroke="rgba(255,255,255,0.16)" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+      } else if (p.hairStyle === 'slick') {
+        hairFront = `
+          <path d="M21 32c0-14 38-15 38 0-7-8-31-8-38 0z" fill="${p.hair}"/>
+          <path d="M26 22c8-3 20-3 28 0" stroke="rgba(255,255,255,0.16)" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+      } else if (p.hairStyle === 'parted') {
+        hairFront = `
+          <path d="M21 33c0-14 38-15 38 0-6-5-14-9-24-6-6 2-11 4-14 6z" fill="${p.hair}"/>
+          <path d="M26 23c7-3 18-3 24 1" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+      } else {
+        hairFront = `
+          <path d="M21 32c1-13 37-13 38 0-6-7-32-7-38 0z" fill="${p.hair}"/>
+          <path d="M27 22c7-2 19-2 26 0" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+      }
+
+      // Sculpted jawline facial hair
+      let beardSvg = '';
+      if (p.beard === 'short') {
+        beardSvg = `<path d="M23 44c0 12 8 18 17 18s17-6 17-18c-3 5-8 8-17 8s-14-3-17-8z" fill="${p.hair}" opacity="0.88"/>
+                    <path d="M35 50c2-1 8-1 10 0" stroke="${p.skin}" stroke-width="2.5" stroke-linecap="round"/>`;
+      } else if (p.beard === 'goatee') {
+        beardSvg = `<path d="M33 50c1 7 13 7 14 0-3 2-11 2-14 0z" fill="${p.hair}" opacity="0.9"/>`;
+      } else if (p.beard === 'stubble') {
+        beardSvg = `<path d="M24 46c2 10 8 14 16 14s14-4 16-14c-4 6-9 9-16 9s-12-3-16-9z" fill="${p.hair}" opacity="0.28"/>`;
+      }
+
+      const glassesSvg = p.glasses
+        ? `<g>
+            <rect x="25" y="34" width="12.5" height="8.5" rx="2.5" fill="rgba(255,255,255,0.14)" stroke="#0f172a" stroke-width="1.8"/>
+            <rect x="42.5" y="34" width="12.5" height="8.5" rx="2.5" fill="rgba(255,255,255,0.14)" stroke="#0f172a" stroke-width="1.8"/>
+            <line x1="37.5" y1="38" x2="42.5" y2="38" stroke="#0f172a" stroke-width="1.8"/>
+           </g>`
+        : '';
+
+      const photoUrl = PRO_PHOTOS[p.id] || '';
+      const imgHtml = photoUrl
+        ? `<img src="${photoUrl}" alt="${p.name}" loading="lazy" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" />`
+        : '';
+      const svgStyle = photoUrl ? 'style="display:none;"' : '';
+      return `<div class="${sizeClass}" style="background:radial-gradient(circle at 35% 25%, ${p.bg}, #020617);border:2px solid #334155;">
+        ${imgHtml}
+        <svg ${svgStyle} viewBox="0 0 80 80" width="100%" height="100%">
+          <defs>
+            <linearGradient id="suit_${uid}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${coat}"/>
+              <stop offset="100%" stop-color="#020617"/>
+            </linearGradient>
+          </defs>
+          ${hairBack}
+          <!-- Shoulders & Suit -->
+          <path d="M12 80c3-14 14-19 28-19s25 5 28 19z" fill="url(#suit_${uid})"/>
+          <path d="M32 61l8 15 8-15z" fill="#f8fafc"/>
+          <path d="M38 63l2 14 2-14z" fill="${tie}"/>
+          <!-- Neck & Chin Shadow -->
+          <rect x="34" y="52" width="12" height="12" rx="4" fill="${p.skin}"/>
+          <path d="M34 54c4 3 8 3 12 0v3c-4 2-8 2-12 0z" fill="rgba(0,0,0,0.18)"/>
+          <!-- Ears -->
+          <ellipse cx="21.5" cy="41" rx="2.6" ry="4.5" fill="${p.skin}"/>
+          <ellipse cx="58.5" cy="41" rx="2.6" ry="4.5" fill="${p.skin}"/>
+          <!-- Sculpted Head / Jawline -->
+          <path d="M22 36c0-11 8-18 18-18s18 7 18 18c0 11-6 21-18 22-12-1-18-11-18-22z" fill="${p.skin}"/>
+          ${beardSvg}
+          <!-- Eyebrows -->
+          <path d="M27 33c2.5-1.6 6-1.6 8.5-.4" stroke="${p.hair}" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M44.5 32.6c2.5-1.2 6-1.2 8.5.4" stroke="${p.hair}" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Expressive Eyes -->
+          <ellipse cx="31.5" cy="38" rx="3" ry="2.2" fill="#ffffff"/>
+          <circle cx="31.8" cy="38" r="1.5" fill="#1e293b"/>
+          <circle cx="32.3" cy="37.4" r="0.5" fill="#ffffff"/>
+          <ellipse cx="48.5" cy="38" rx="3" ry="2.2" fill="#ffffff"/>
+          <circle cx="48.2" cy="38" r="1.5" fill="#1e293b"/>
+          <circle cx="48.7" cy="37.4" r="0.5" fill="#ffffff"/>
+          <!-- Nose -->
+          <path d="M40 37v7.5c0 1-1.5 1.5-2.2 1.2" stroke="rgba(0,0,0,0.22)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- Confident Smile -->
+          <path d="M35 49.5c3 2.3 7 2.3 10 0" stroke="#7c2d12" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          ${glassesSvg}
+          ${hairFront}
+        </svg>
+      </div>`;
+    }
+
+    const BOOK_LINES = [
+      ['e4','e5','Nf3','Nc6','Bb5','a6','Ba4','Nf6','O-O','Be7'],
+      ['e4','e5','Nf3','Nc6','Bb5','Nf6','O-O','Nxe4'],
+      ['e4','e5','Nf3','Nc6','Bc4','Bc5','c3','Nf6','d4','exd4'],
+      ['e4','e5','Nf3','Nc6','Bc4','Bc5','d3','Nf6','Nc3','d6'],
+      ['e4','e5','Nf3','Nc6','Bc4','Nf6','Ng5','d5','exd5'],
+      ['e4','e5','Nf3','Nc6','Bc4','Nf6','d3','Bc5'],
+      ['e4','e5','Nf3','Nc6','d4','exd4','Nxd4','Bc5'],
+      ['e4','e5','Nf3','Nc6','Nc3','Nf6','Bb5'],
+      ['e4','e5','Nf3','Nf6','Nxe5','d6','Nf3','Nxe4'],
+      ['e4','e5','Nf3','d6','d4','exd4','Nxd4'],
+      ['e4','e5','Nc3','Nf6','Bc4','Nc6'],
+      ['e4','e5','Bc4','Nf6','d3','Nc6'],
+      ['e4','e5','f4','exd4','Nf3','g5'],
+      ['e4','c5','Nf3','d6','d4','cxd4','Nxd4','Nf6','Nc3','a6'],
+      ['e4','c5','Nf3','Nc6','d4','cxd4','Nxd4','Nf6','Nc3'],
+      ['e4','c5','Nf3','e6','d4','cxd4','Nxd4'],
+      ['e4','c5','c3','d5','exd5','Qxd5','d4'],
+      ['e4','c5','Nc3','Nc6','g3','g6','Bg2'],
+      ['e4','e6','d4','d5','Nc3','Nf6','Bg5'],
+      ['e4','e6','d4','d5','Nd2','Nf6'],
+      ['e4','e6','d4','d5','e5','c5','c3'],
+      ['e4','c6','d4','d5','Nc3','dxe4','Nxe4','Bf5'],
+      ['e4','c6','d4','d5','e5','Bf5'],
+      ['e4','d5','exd5','Qxd5','Nc3','Qa5'],
+      ['e4','d6','d4','Nf6','Nc3','g6'],
+      ['e4','Nf6','e5','Nd5','d4','d6'],
+      ['d4','d5','c4','e6','Nc3','Nf6','Bg5','Be7'],
+      ['d4','d5','c4','c6','Nf3','Nf6','Nc3','dxc4'],
+      ['d4','d5','c4','dxc4','Nf3','Nf6','e3'],
+      ['d4','d5','Bf4','Nf6','e3','c5','c3','Nc6'],
+      ['d4','d5','Nf3','Nf6','c4','e6'],
+      ['d4','Nf6','c4','g6','Nc3','Bg7','e4','d6','Nf3','O-O'],
+      ['d4','Nf6','c4','g6','Nc3','d5'],
+      ['d4','Nf6','c4','e6','Nc3','Bb4','e3'],
+      ['d4','Nf6','c4','e6','Nf3','d5','g3'],
+      ['d4','Nf6','c4','c5','d5','e6'],
+      ['d4','f5','g3','Nf6','Bg2','e6'],
+      ['c4','e5','Nc3','Nf6','g3','d5','cxd5'],
+      ['c4','Nf6','Nc3','e6','Nf3','d5'],
+      ['Nf3','d5','d4','Nf6','c4','e6'],
+      ['g3','d5','Bg2','Nf6','Nf3','c6']
+    ];
+    const EARLY_BOOK_MOVES = new Set([
+      'e4','d4','c4','Nf3','Nc3','g3','b3','e3','d3','c3','f4',
+      'e5','d5','c5','e6','c6','d6','g6','Nf6','Nc6','f5',
+      'Bc4','Bb5','Bf4','Bg5','Be2','Bd3','Bg2','Bb2','Be7','Bc5','Bb4','Bg7','O-O'
+    ]);
+
+    const CLS_META = {
+      book:      { label: 'Book',      sym: '📖', cls: 'cls-book',      color: '#fbbf24' },
+      brilliant: { label: 'Brilliant', sym: '!!', cls: 'cls-brilliant', color: '#22d3ee' },
+      great:     { label: 'Great',     sym: '!',  cls: 'cls-great',     color: '#60a5fa' },
+      best:      { label: 'Best',      sym: '★',  cls: 'cls-best',      color: '#34d399' },
+      good:      { label: 'Good',      sym: '✓',  cls: 'cls-good',      color: '#a3e635' },
+      miss:      { label: 'Miss',      sym: '✕',  cls: 'cls-miss',      color: '#fb923c' },
+      mistake:   { label: 'Mistake',   sym: '?',  cls: 'cls-mistake',   color: '#facc15' },
+      blunder:   { label: 'Blunder',   sym: '??', cls: 'cls-blunder',   color: '#fb7185' }
+    };
+
+    const STORAGE_KEY = 'chess_studio_saved_games_v1';
+
+
+    const DEFAULT_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAJKQxMBWgEjZD0RFZjh86_1KtcCuK2Ivs",
+      authDomain: "chess-studio-900a5.firebaseapp.com",
+      databaseURL: "https://chess-studio-900a5-default-rtdb.firebaseio.com",
+      projectId: "chess-studio-900a5",
+      storageBucket: "chess-studio-900a5.firebasestorage.app",
+      messagingSenderId: "4779342051",
+      appId: "1:4779342051:web:91191d03e9ab2d9297add6",
+      measurementId: "G-LH1YSW3HR5"
+    };
+    const FB_CFG_KEY = 'chess_studio_firebase_cfg_v1';
+    let fbDb = null;
+    let fbConnected = false;
+    let activeOnlineMatchId = null;
+    let fbMatchRef = null;
+    let fbQueueRef = null;
+    let fbMoveCountSynced = 0;
+
+    function loadFirebaseConfig() {
+      if (DEFAULT_FIREBASE_CONFIG.apiKey && DEFAULT_FIREBASE_CONFIG.databaseURL) {
+        return DEFAULT_FIREBASE_CONFIG;
+      }
+      try {
+        const raw = localStorage.getItem(FB_CFG_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) { return null; }
+    }
+
+    function initFirebaseFromSaved() {
+      const cfg = loadFirebaseConfig();
+      const badge = document.getElementById('fbStatusBadge');
+      const msg = document.getElementById('fbMsg');
+      if (!cfg || !cfg.apiKey || !cfg.databaseURL || typeof firebase === 'undefined') {
+        fbDb = null;
+        fbConnected = false;
+        if (badge) { badge.className = 'badge fallback'; badge.textContent = 'Local Simulated Mode'; }
+        return;
+      }
+      try {
+
+        const app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(cfg);
+        fbDb = app.database();
+        fbConnected = true;
+        badge.className = 'badge ready';
+        badge.textContent = 'Live Firebase Connected';
+        if (msg) msg.textContent = 'Connected! Online matches will pair real players in real time.';
+      } catch (err) {
+        fbDb = null;
+        fbConnected = false;
+        badge.className = 'badge fallback';
+        badge.textContent = 'Connection Error';
+        if (msg) msg.textContent = 'Could not connect—check your Firebase config.';
+      }
+    }
+
+    function cleanupOnlineListeners() {
+      if (fbMatchRef) { try { fbMatchRef.off(); } catch (_) {} fbMatchRef = null; }
+      if (fbQueueRef) { try { fbQueueRef.off(); fbQueueRef.remove(); } catch (_) {} fbQueueRef = null; }
+      activeOnlineMatchId = null;
+      fbMoveCountSynced = 0;
+    }
+
+    function pushMoveToFirebase(move) {
+      if (!fbConnected || !fbDb || !activeOnlineMatchId || activeMatchMode !== 'online') return;
+      try {
+        const idx = game.history().length - 1;
+        fbMoveCountSynced = game.history().length;
+        fbDb.ref(`matches/${activeOnlineMatchId}/moves/${idx}`).set({
+          from: move.from,
+          to: move.to,
+          promotion: move.promotion || null,
+          by: userProfile.username
+        });
+      } catch (_) {}
+    }
+
+    function pushResultToFirebase(status) {
+      if (!fbConnected || !fbDb || !activeOnlineMatchId || activeMatchMode !== 'online') return;
+      try {
+        fbDb.ref(`matches/${activeOnlineMatchId}/status`).set(status);
+      } catch (_) {}
+    }
+
+    const PROFILE_KEY = 'chess_studio_profile_v1';
+    const TAKEN_NAMES_KEY = 'chess_studio_taken_names_v1';
+    const SEED_USERNAMES = ['Magnus_NO','Hikaru_01','Gukesh-GM','Tal_1960','Pragg_IN','ChessKing_99','Tactician-X','RapidStar_7'];
+    let userProfile = null;
+    let activeMatchMode = 'bot'; // 'bot' | 'online'
+    let activeOnlineOpponent = null; // { username, country, avatar, rating }
+    let selectedOnlineTc = '3|2';
+
+    function getTakenUsernames() {
+      try {
+        const raw = localStorage.getItem(TAKEN_NAMES_KEY);
+        const list = raw ? JSON.parse(raw) : [];
+        return Array.from(new Set([...SEED_USERNAMES, ...(Array.isArray(list) ? list : [])]));
+      } catch (_) { return [...SEED_USERNAMES]; }
+    }
+
+    function registerTakenUsername(uname) {
+      try {
+        const list = getTakenUsernames();
+        if (!list.some(x => x.toLowerCase() === uname.toLowerCase())) {
+          list.push(uname);
+          localStorage.setItem(TAKEN_NAMES_KEY, JSON.stringify(list));
+        }
+      } catch (_) {}
+    }
+
+    function loadProfile() {
+      try {
+        const raw = localStorage.getItem(PROFILE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) { return null; }
+    }
+
+    function saveProfileData(prof) {
+      userProfile = prof;
+      try { localStorage.setItem(PROFILE_KEY, JSON.stringify(prof)); } catch (_) {}
+      renderProfileUI();
+    }
+
+    function renderProfileUI() {
+      const btn = document.getElementById('profileBtn');
+      if (userProfile && userProfile.username) {
+        btn.textContent = `${userProfile.avatar || '♞'} ${userProfile.country || ''} @${userProfile.username} (${userProfile.rating})`;
+      } else {
+        btn.textContent = '👤 Create Chess ID';
+      }
+      if (typeof updatePlayerBars === 'function' && game) updatePlayerBars();
+    }
+
+    function openProfileModal() {
+      const modal = document.getElementById('profileModal');
+      const title = document.getElementById('profileModalTitle');
+      const statsRow = document.getElementById('profileStatsRow');
+      document.getElementById('profError').style.display = 'none';
+
+      if (userProfile) {
+        title.textContent = `Your Chess ID — @${userProfile.username}`;
+        statsRow.classList.remove('hidden');
+        document.getElementById('profRatingVal').textContent = userProfile.rating;
+        document.getElementById('profRecordVal').textContent = `${userProfile.wins}W / ${userProfile.losses}L / ${userProfile.draws}D`;
+        document.getElementById('profUsername').value = userProfile.username;
+        document.getElementById('profCountry').value = userProfile.country || '🇮🇳';
+        document.getElementById('profAvatarIcon').value = userProfile.avatar || '♞';
+      } else {
+        title.textContent = 'Create Your Chess ID';
+        statsRow.classList.add('hidden');
+        document.getElementById('profUsername').value = '';
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function updateProfileStatsOnGameEnd(outcome) {
+      if (!userProfile || activeMatchMode !== 'online') return;
+      const oppElo = activeOnlineOpponent ? activeOnlineOpponent.rating : 1200;
+      const expected = 1 / (1 + Math.pow(10, (oppElo - userProfile.rating) / 400));
+      const actual = outcome === 'win' ? 1 : (outcome === 'draw' ? 0.5 : 0);
+      const delta = Math.round(24 * (actual - expected));
+
+      userProfile.rating = Math.max(400, userProfile.rating + delta);
+      if (outcome === 'win') userProfile.wins += 1;
+      else if (outcome === 'loss') userProfile.losses += 1;
+      else userProfile.draws += 1;
+      saveProfileData(userProfile);
+    }
+
+    const game = typeof Chess !== 'undefined' ? new Chess() : null;
+    let currentPage = 'home'; // 'home' | 'pro' | 'arena'
+    let playerColor = 'w';
+    let flipped = false;
+    let botLevel = 5;
+    let activeGameLevel = 5;
+
+    // Pro Bot state
+    let selectedProId = 'magnus';
+    let selectedProElo = 2000;
+    let proPlayerColor = 'w';
+    let proEnableEvalBar = false;
+    let proEnableSuggest = false;
+    let activeProPlayer = null; // null for standard Stockfish, or { id, name, elo, ... }
+
+    let gameStarted = false;
+    let resigned = false;
+    let timedOutWinner = null;
+    let savedThisGame = false;
+    let lastSavedGameId = null;
+    let reviewingSaved = null;
+    let enableEvalBar = false;
+    let enableSuggest = false;
+
+    let reviewData = null;
+    let reviewRunning = false;
+
+    let timerEnabled = true;
+    let baseMinutes = 10;
+    let incSeconds = 0;
+    let whiteTimeMs = 10 * 60 * 1000;
+    let blackTimeMs = 10 * 60 * 1000;
+    let lastTickAt = null;
+    let clockInterval = null;
+
+    let selectedSquare = null;
+    let legalTargets = [];
+    let lastMove = null;
+    let pendingPromo = null;
+    let botThinking = false;
+    let hintThinking = false;
+    let currentHint = null;
+    let muted = false;
+    let audioCtx = null;
+    let animTimer = null;
+    let viewPly = null;
+
+    const evalCache = {};
+    let currentEval = { type: 'cp', value: 0 };
+
+    const STOCKFISH_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js';
+    let sfWorker = null;
+    let sfReady = false;
+    let sfJob = null;
+    let sfPvMap = {};
+    let sfBestDepth = 0;
+
+    function getActiveBotConfig() {
+      if (activeMatchMode === 'online' && activeOnlineOpponent) {
+        const r = activeOnlineOpponent.rating;
+        if (r < 900) return BOT_LEVELS[2];
+        if (r < 1150) return BOT_LEVELS[3];
+        if (r < 1350) return BOT_LEVELS[4];
+        if (r < 1550) return BOT_LEVELS[5];
+        if (r < 1750) return BOT_LEVELS[7];
+        if (r < 1950) return BOT_LEVELS[8];
+        return BOT_LEVELS[10];
+      }
+      if (activeProPlayer) return PRO_ELO_CONFIGS[activeProPlayer.elo] || PRO_ELO_CONFIGS[2000];
+      return BOT_LEVELS[activeGameLevel] || BOT_LEVELS[5];
+    }
+
+    function showPage(page) {
+      currentPage = page;
+      document.getElementById('homePage').classList.toggle('hidden', page !== 'home');
+      document.getElementById('onlinePage').classList.toggle('hidden', page !== 'online');
+      document.getElementById('proPage').classList.toggle('hidden', page !== 'pro');
+      document.getElementById('arenaPage').classList.toggle('hidden', page !== 'arena');
+
+      const navHome = document.getElementById('navHomeBtn');
+      const navOnline = document.getElementById('navOnlineBtn');
+      const navPro = document.getElementById('navProBtn');
+      const navArena = document.getElementById('navArenaBtn');
+      navHome.classList.toggle('active', page === 'home');
+      navOnline.classList.toggle('active', page === 'online');
+      navPro.classList.toggle('active', page === 'pro');
+      navArena.classList.toggle('active', page === 'arena');
+      if (page === 'online') updateOnlinePageState();
+
+      const hasArenaSession = gameStarted || Boolean(reviewingSaved) || Boolean(reviewData);
+      navArena.classList.toggle('hidden', !hasArenaSession && page !== 'arena');
+      navArena.textContent = reviewingSaved ? '🔍 Review Board' : '♟ Game Board';
+    }
+
+    function renderProPage(filter = '') {
+      const q = filter.trim().toLowerCase();
+      const filtered = PRO_PLAYERS.filter(p =>
+        !q || p.name.toLowerCase().includes(q) || p.style.toLowerCase().includes(q)
+      );
+      document.getElementById('proCountLabel').textContent = `${filtered.length} players`;
+
+      const grid = document.getElementById('proGrid');
+      grid.innerHTML = filtered.map(p => `
+        <button type="button" data-pro-id="${p.id}" class="pro-card ${p.id === selectedProId ? 'selected' : ''}">
+          ${renderProAvatar(p, 'pro-avatar-lg')}
+          <div class="pro-name">${p.flag} ${p.name}</div>
+          <div class="pro-tag">${p.style}</div>
+        </button>
+      `).join('');
+
+      grid.querySelectorAll('[data-pro-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedProId = btn.dataset.proId;
+          renderProPage(document.getElementById('proSearchInput').value);
+          renderProSetupCard();
+        });
+      });
+      renderProSetupCard();
+    }
+
+    function renderProSetupCard() {
+      const p = PRO_PLAYERS.find(x => x.id === selectedProId) || PRO_PLAYERS[0];
+      document.getElementById('proSelectedAvatar').outerHTML =
+        renderProAvatar(p, 'pro-avatar-lg').replace('<div class="pro-avatar-lg"', '<div id="proSelectedAvatar" class="pro-avatar-lg"');
+      document.getElementById('proSelectedName').textContent = p.name;
+      document.getElementById('proSelectedMeta').textContent = `${p.flag} ${p.style}`;
+      document.getElementById('proSelectedBio').textContent = p.bio;
+
+      const eloGrid = document.getElementById('proEloGrid');
+      eloGrid.innerHTML = PRO_ELO_VARIANTS.map(elo => `
+        <button type="button" data-elo="${elo}" class="elo-chip ${elo === selectedProElo ? 'active' : ''}">${elo}</button>
+      `).join('');
+      eloGrid.querySelectorAll('[data-elo]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedProElo = Number(btn.dataset.elo);
+          renderProSetupCard();
+        });
+      });
+
+      document.getElementById('proStartBtn').textContent = `▶ Play vs ${p.name} (${selectedProElo} Elo)`;
+    }
+
+    function isGameOver() {
+      return !game || resigned || Boolean(timedOutWinner) || game.game_over();
+    }
+
+    function isPreviewing() {
+      if (!game || viewPly === null) return false;
+      return viewPly < game.history().length;
+    }
+
+    function shouldShowEvalBar() {
+      return Boolean(reviewingSaved) || Boolean(reviewData) || (gameStarted && isGameOver() && reviewRunning) || (gameStarted && !isGameOver() && enableEvalBar);
+    }
+
+    function readTimeFrom(selectId, minId, incId) {
+      const sel = document.getElementById(selectId).value;
+      if (sel === 'none') {
+        timerEnabled = false; baseMinutes = 0; incSeconds = 0;
+      } else if (sel === 'custom') {
+        timerEnabled = true;
+        baseMinutes = Math.max(1, Math.min(180, parseInt(document.getElementById(minId).value, 10) || 10));
+        incSeconds = Math.max(0, Math.min(60, parseInt(document.getElementById(incId).value, 10) || 0));
+      } else {
+        timerEnabled = true;
+        const [m, inc] = sel.split('|').map(Number);
+        baseMinutes = m; incSeconds = inc;
+      }
+    }
+
+    function formatClock(ms) {
+      const totalSec = Math.max(0, Math.ceil(ms / 1000));
+      const mins = Math.floor(totalSec / 60);
+      const secs = totalSec % 60;
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function stopClock() {
+      if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+      lastTickAt = null;
+    }
+
+    function startClock() {
+      stopClock();
+      if (!timerEnabled || !gameStarted || isGameOver()) return;
+      lastTickAt = performance.now();
+      clockInterval = setInterval(() => {
+        if (!gameStarted || isGameOver()) { stopClock(); return; }
+        const now = performance.now();
+        const dt = now - lastTickAt;
+        lastTickAt = now;
+        if (game.turn() === 'w') {
+          whiteTimeMs = Math.max(0, whiteTimeMs - dt);
+          if (whiteTimeMs === 0) {
+            timedOutWinner = 'b'; stopClock(); botThinking = false; sfJob = null;
+            playSound('gameover'); saveCompletedGame(); updateUI(); return;
+          }
+        } else {
+          blackTimeMs = Math.max(0, blackTimeMs - dt);
+          if (blackTimeMs === 0) {
+            timedOutWinner = 'w'; stopClock(); botThinking = false; sfJob = null;
+            playSound('gameover'); saveCompletedGame(); updateUI(); return;
+          }
+        }
+        updateClocksUI();
+      }, 150);
+    }
+
+    function updateClocksUI() {
+      const topClock = document.getElementById('topClock');
+      const botClock = document.getElementById('bottomClock');
+      const show = timerEnabled && !reviewingSaved && !reviewData;
+      topClock.classList.toggle('hidden', !show);
+      botClock.classList.toggle('hidden', !show);
+      if (!show) return;
+
+      const activePlay = gameStarted && !isGameOver();
+      const topIsBot = !flipped ? (playerColor === 'w') : (playerColor === 'b');
+      const botColor = playerColor === 'w' ? 'b' : 'w';
+      const topSide = topIsBot ? botColor : playerColor;
+      const bottomSide = topIsBot ? playerColor : botColor;
+
+      const topMs = topSide === 'w' ? whiteTimeMs : blackTimeMs;
+      const botMs = bottomSide === 'w' ? whiteTimeMs : blackTimeMs;
+      topClock.textContent = formatClock(topMs);
+      botClock.textContent = formatClock(botMs);
+
+      const turn = game ? game.turn() : 'w';
+      topClock.className = 'clock-pill' + (activePlay && turn === topSide ? (topMs < 20000 ? ' low' : ' active') : '');
+      botClock.className = 'clock-pill' + (activePlay && turn === bottomSide ? (botMs < 20000 ? ' low' : ' active') : '');
+    }
+
+    function loadSavedGames() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (_) { return []; }
+    }
+
+    function persistSavedGames(list) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch (_) {}
+    }
+
+    function saveCompletedGame() {
+      if (savedThisGame || reviewingSaved || !game || game.history().length === 0) return;
+      savedThisGame = true;
+
+      let resultText = 'Draw';
+      let outcome = 'draw';
+      if (resigned) {
+        resultText = 'Resigned'; outcome = 'loss';
+      } else if (timedOutWinner) {
+        const youWon = timedOutWinner === playerColor;
+        resultText = youWon ? 'Win (Time)' : 'Loss (Time)';
+        outcome = youWon ? 'win' : 'loss';
+      } else if (game.in_checkmate()) {
+        const youWon = game.turn() !== playerColor;
+        resultText = youWon ? 'Win (Checkmate)' : 'Loss (Checkmate)';
+        outcome = youWon ? 'win' : 'loss';
+      }
+
+      const id = Date.now();
+      lastSavedGameId = id;
+      const record = {
+        id,
+        date: new Date().toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        playerColor,
+        botLevel: activeGameLevel,
+        botElo: (activeMatchMode === 'online' && activeOnlineOpponent) ? String(activeOnlineOpponent.rating) : (activeProPlayer ? String(activeProPlayer.elo) : BOT_LEVELS[activeGameLevel].elo),
+        proId: activeProPlayer ? activeProPlayer.id : null,
+        proName: (activeMatchMode === 'online' && activeOnlineOpponent) ? `@${activeOnlineOpponent.username} (Online)` : (activeProPlayer ? activeProPlayer.name : null),
+        timeControl: timerEnabled ? `${baseMinutes}+${incSeconds}` : 'Unlimited',
+        resultText,
+        outcome,
+        moves: game.history({ verbose: true }).map(m => ({
+          from: m.from, to: m.to, promotion: m.promotion || null, san: m.san
+        })),
+        reviewData: null
+      };
+
+      updateProfileStatsOnGameEnd(outcome);
+      const existing = loadSavedGames();
+      existing.unshift(record);
+      persistSavedGames(existing.slice(0, 100));
+      initFirebaseFromSaved();
+      userProfile = loadProfile();
+      renderProfileUI();
+      renderSavedGames();
+    }
+
+    function attachReviewToSavedGame(id, rData) {
+      if (!id) return;
+      const list = loadSavedGames();
+      const idx = list.findIndex(g => g.id === id);
+      if (idx !== -1) {
+        list[idx].reviewData = rData;
+        persistSavedGames(list);
+        initFirebaseFromSaved();
+      userProfile = loadProfile();
+      renderProfileUI();
+      renderSavedGames();
+      }
+    }
+
+    function renderSavedGames() {
+      const list = loadSavedGames();
+      document.getElementById('savedCount').textContent = `${list.length} ${list.length === 1 ? 'game' : 'games'}`;
+      const el = document.getElementById('savedList');
+      if (!list.length) {
+        el.innerHTML = '<div class="empty-moves">Finish or resign a game to save it here forever for review.</div>';
+        return;
+      }
+      el.innerHTML = list.map(g => {
+        const pillClass = g.outcome === 'win' ? 'res-win' : (g.outcome === 'loss' ? 'res-loss' : 'res-draw');
+        const sideLabel = g.playerColor === 'w' ? 'White' : 'Black';
+        const tc = g.timeControl ? ` · ${g.timeControl}` : '';
+        const revTag = g.reviewData ? ' · ★ Reviewed' : '';
+        const oppLabel = g.proName ? `${g.proName} (${g.botElo})` : `Level ${g.botLevel} (${g.botElo} Elo)`;
+        return `<div class="saved-item">
+          <div class="saved-meta">
+            <div class="saved-title">vs ${oppLabel} · ${sideLabel}</div>
+            <div class="saved-sub">${g.date}${tc} · ${g.moves.length} moves${revTag}</div>
+          </div>
+          <div class="saved-actions">
+            <span class="res-pill ${pillClass}">${g.resultText}</span>
+            <button type="button" data-open-id="${g.id}" class="btn-ghost" style="padding:5px 10px;">Review</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      el.querySelectorAll('[data-open-id]').forEach(btn => {
+        btn.addEventListener('click', () => openSavedGame(Number(btn.dataset.openId)));
+      });
+    }
+
+    function openSavedGame(id) {
+      if (!game || reviewRunning) return;
+      const found = loadSavedGames().find(g => g.id === id);
+      if (!found) return;
+
+      stopClock();
+      reviewingSaved = found;
+      reviewData = found.reviewData || null;
+      lastSavedGameId = found.id;
+      activeProPlayer = found.proId
+        ? { ...(PRO_PLAYERS.find(p => p.id === found.proId) || {}), elo: Number(found.botElo) }
+        : null;
+      gameStarted = false;
+      resigned = false;
+      timedOutWinner = null;
+      botThinking = false;
+      hintThinking = false;
+      currentHint = null;
+      sfJob = null;
+      selectedSquare = null;
+      legalTargets = [];
+      playerColor = found.playerColor;
+      flipped = (found.playerColor === 'b');
+      activeGameLevel = found.botLevel || 5;
+
+      game.reset();
+      for (const m of found.moves) {
+        game.move({ from: m.from, to: m.to, promotion: m.promotion || undefined });
+      }
+      const hist = game.history({ verbose: true });
+      const last = hist[hist.length - 1];
+      lastMove = last ? { from: last.from, to: last.to } : null;
+      viewPly = hist.length;
+
+      showPage('arena');
+      updateUI();
+      evaluateDisplayedPosition();
+    }
+
+    function getDisplayChess() {
+      if (!game) return null;
+      const total = game.history().length;
+      if (viewPly === null || viewPly >= total) return { chess: game, move: lastMove };
+
+      const preview = new Chess();
+      const verboseMoves = game.history({ verbose: true });
+      let previewLast = null;
+      for (let i = 0; i < viewPly; i++) {
+        const m = verboseMoves[i];
+        preview.move({ from: m.from, to: m.to, promotion: m.promotion });
+        previewLast = { from: m.from, to: m.to };
+      }
+      return { chess: preview, move: previewLast };
+    }
+
+    function playSound(type) {
+      if (muted) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        if (type === 'move') {
+          osc.frequency.setValueAtTime(240, now);
+          osc.frequency.exponentialRampToValueAtTime(120, now + 0.06);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+          osc.start(now); osc.stop(now + 0.07);
+        } else if (type === 'capture') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(340, now);
+          osc.frequency.exponentialRampToValueAtTime(90, now + 0.09);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'check') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(380, now + 0.14);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.start(now); osc.stop(now + 0.15);
+        } else if (type === 'gameover') {
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(330, now + 0.12);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now); osc.stop(now + 0.35);
+        }
+      } catch (_) {}
+    }
+
+    function parseStockfishInfo(line) {
+      const depthMatch = line.match(/\bdepth (\d+)/);
+      const pvIdxMatch = line.match(/\bmultipv (\d+)/);
+      const scoreMatch = line.match(/\bscore (cp|mate) (-?\d+)/);
+      const pvMoveMatch = line.match(/\bpv ([a-h][1-8][a-h][1-8][qrbn]?)/);
+      if (!depthMatch || !pvMoveMatch) return;
+
+      const depth = parseInt(depthMatch[1], 10);
+      const idx = pvIdxMatch ? parseInt(pvIdxMatch[1], 10) : 1;
+      let cp = 0;
+      let scoreObj = { type: 'cp', value: 0 };
+      if (scoreMatch) {
+        const val = parseInt(scoreMatch[2], 10);
+        if (scoreMatch[1] === 'mate') {
+          cp = val > 0 ? 10000 - val : -10000 - val;
+          scoreObj = { type: 'mate', value: val };
+        } else {
+          cp = val;
+          scoreObj = { type: 'cp', value: val };
+        }
+      }
+      if (depth >= sfBestDepth) {
+        if (depth > sfBestDepth) { sfBestDepth = depth; sfPvMap = {}; }
+        sfPvMap[idx] = { move: pvMoveMatch[1], cp, scoreObj };
+      }
+    }
+
+    function formatEvalWhite(ev) {
+      if (!ev) return '0.0';
+      if (ev.type === 'mate') {
+        if (ev.value === 0) return 'Mate';
+        return ev.value > 0 ? `M${ev.value}` : `-M${Math.abs(ev.value)}`;
+      }
+      const pawns = (ev.value / 100).toFixed(1);
+      return ev.value > 0 ? `+${pawns}` : pawns;
+    }
+
+    function toWhitePerspective(scoreObj, turnToMove) {
+      if (!scoreObj) return { type: 'cp', value: 0 };
+      const sign = turnToMove === 'w' ? 1 : -1;
+      return { type: scoreObj.type, value: scoreObj.value * sign };
+    }
+
+    function scoreObjToWhiteCp(ev) {
+      if (!ev) return 0;
+      if (ev.type === 'mate') return ev.value >= 0 ? 2000 : -2000;
+      return ev.value;
+    }
+
+    function updateEvalBarUI() {
+      const bar = document.getElementById('evalBar');
+      const pill = document.getElementById('evalPill');
+      const showBar = shouldShowEvalBar();
+
+      bar.classList.toggle('hidden', !showBar);
+      pill.classList.toggle('hidden', !showBar);
+      if (!showBar) return;
+
+      bar.classList.toggle('flipped', flipped);
+      const fill = document.getElementById('evalFill');
+      const topTxt = document.getElementById('evalTopText');
+      const botTxt = document.getElementById('evalBottomText');
+
+      let whitePct = 50;
+      if (currentEval.type === 'mate') {
+        whitePct = currentEval.value >= 0 ? 100 : 0;
+      } else {
+        const sigmoid = 2 / (1 + Math.exp(-0.0038 * currentEval.value)) - 1;
+        whitePct = Math.max(4, Math.min(96, 50 + 50 * sigmoid));
+      }
+      fill.style.height = `${whitePct.toFixed(1)}%`;
+
+      const label = formatEvalWhite(currentEval);
+      pill.textContent = `Eval: ${label}`;
+
+      const whiteAhead = currentEval.value >= 0;
+      if (!flipped) {
+        botTxt.textContent = whiteAhead ? label : '';
+        topTxt.textContent = !whiteAhead ? label : '';
+      } else {
+        topTxt.textContent = whiteAhead ? label : '';
+        botTxt.textContent = !whiteAhead ? label : '';
+      }
+    }
+
+    function runStockfishJob(opts, onDone) {
+      if (!sfWorker || !sfReady) return false;
+      if (sfJob) sfWorker.postMessage('stop');
+      sfPvMap = {};
+      sfBestDepth = 0;
+      sfJob = { ...opts, onDone };
+      sfWorker.postMessage(`setoption name MultiPV value ${opts.multipv || 1}`);
+      sfWorker.postMessage(`setoption name Skill Level value ${opts.skill ?? 20}`);
+      sfWorker.postMessage(`position fen ${opts.fen}`);
+      sfWorker.postMessage(`go depth ${opts.depth} movetime ${opts.movetime}`);
+      return true;
+    }
+
+    function runStockfishAsync(opts) {
+      return new Promise((resolve) => {
+        if (sfWorker && sfReady) {
+          runStockfishJob(opts, (best, pvMap) => resolve({ best, pvMap }));
+        } else {
+          const temp = new Chess(opts.fen);
+          const cp = evaluateBoardMaterialFor(temp);
+          const moves = temp.moves({ verbose: true });
+          const m = moves[0];
+          resolve({
+            best: m ? m.from + m.to + (m.promotion || '') : null,
+            pvMap: { 1: { move: m ? m.from + m.to : null, cp, scoreObj: { type: 'cp', value: temp.turn() === 'w' ? cp : -cp } } }
+          });
+        }
+      });
+    }
+
+    function evaluateDisplayedPosition() {
+      if (!shouldShowEvalBar()) return;
+      const disp = getDisplayChess();
+      if (!disp) return;
+      const c = disp.chess;
+      const fen = c.fen();
+
+      const total = game ? game.history().length : 0;
+      const curPly = viewPly === null ? total : viewPly;
+      if (reviewData && curPly > 0 && reviewData.moves[curPly - 1]) {
+        currentEval = reviewData.moves[curPly - 1].evalAfter;
+        updateEvalBarUI();
+        return;
+      }
+
+      if (c.in_checkmate()) {
+        currentEval = { type: 'cp', value: c.turn() === 'w' ? -9999 : 9999 };
+        updateEvalBarUI();
+        return;
+      }
+      if (c.in_draw()) {
+        currentEval = { type: 'cp', value: 0 };
+        updateEvalBarUI();
+        return;
+      }
+      if (evalCache[fen]) {
+        currentEval = evalCache[fen];
+        updateEvalBarUI();
+        return;
+      }
+      if (sfWorker && sfReady && !botThinking && !hintThinking && !reviewRunning) {
+        const turn = c.turn();
+        runStockfishJob({ kind: 'eval', fen, turn, skill: 20, depth: 10, movetime: 240, multipv: 1 }, (best, pvMap) => {
+          const top = pvMap[1];
+          if (top && top.scoreObj) {
+            const whiteEv = toWhitePerspective(top.scoreObj, turn);
+            evalCache[fen] = whiteEv;
+            currentEval = whiteEv;
+            updateEvalBarUI();
+          }
+        });
+      } else {
+        currentEval = { type: 'cp', value: evaluateBoardMaterialFor(c) };
+        updateEvalBarUI();
+      }
+    }
+
+    function isBookMove(sanHistorySlice) {
+      if (sanHistorySlice.length > 10) return false;
+      return BOOK_LINES.some(line =>
+        sanHistorySlice.length <= line.length &&
+        sanHistorySlice.every((san, idx) => line[idx] === san)
+      );
+    }
+
+    function materialBalance(c, color) {
+      const vals = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+      const b = c.board();
+      let sum = 0;
+      for (let r = 0; r < 8; r++) {
+        for (let col = 0; col < 8; col++) {
+          const p = b[r][col];
+          if (p && p.color === color) sum += vals[p.type];
+        }
+      }
+      return sum;
+    }
+
+    function cpToWinPct(cp) {
+      const clamped = Math.max(-1000, Math.min(1000, cp));
+      return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * clamped)) - 1);
+    }
+
+    function classifyMove({ sanSlice, playedUci, bestUci, bestWhiteEv, secondWhiteEv, afterWhiteEv, moverColor, matBefore, matAfter }) {
+      const sign = moverColor === 'w' ? 1 : -1;
+      const bestMoverCp = scoreObjToWhiteCp(bestWhiteEv) * sign;
+      const rawAfterCp = scoreObjToWhiteCp(afterWhiteEv) * sign;
+      const afterMoverCp = (playedUci === bestUci) ? Math.max(bestMoverCp, rawAfterCp) : rawAfterCp;
+
+      const bestWin = cpToWinPct(bestMoverCp);
+      const afterWin = cpToWinPct(afterMoverCp);
+      const wpLoss = Math.max(0, bestWin - afterWin);
+
+      const lastSan = sanSlice[sanSlice.length - 1];
+      if (isBookMove(sanSlice) || (sanSlice.length <= 6 && EARLY_BOOK_MOVES.has(lastSan) && wpLoss <= 7.0)) {
+        return 'book';
+      }
+
+      const secondMoverCp = secondWhiteEv ? scoreObjToWhiteCp(secondWhiteEv) * sign : bestMoverCp - 200;
+      const secondWin = cpToWinPct(secondMoverCp);
+      const winGapToSecond = bestWin - secondWin;
+
+      if (wpLoss <= 1.5 && matAfter <= matBefore - 2 && afterWin >= 45) return 'brilliant';
+      if (wpLoss <= 1.5 && winGapToSecond >= 8.0) return 'great';
+      if (playedUci === bestUci || wpLoss <= 0.8) return 'best';
+      if (bestWin >= 75 && wpLoss >= 10.0 && afterWin >= 45) return 'miss';
+      if (wpLoss <= 6.5) return 'good';
+      if (wpLoss <= 18.0) return 'mistake';
+      return 'blunder';
+    }
+
+    async function runFullGameReview() {
+      if (!game || reviewRunning || game.history().length === 0) return;
+      reviewRunning = true;
+      reviewData = null;
+
+      const progWrap = document.getElementById('reviewProgressWrap');
+      const progText = document.getElementById('reviewProgressText');
+      const progBar = document.getElementById('reviewProgressBar');
+      progWrap.classList.remove('hidden');
+      updateControlsState();
+
+      const verboseMoves = game.history({ verbose: true });
+      const total = verboseMoves.length;
+      const temp = new Chess();
+      const analyzedMoves = [];
+      const sanPrefix = [];
+      const counts = {
+        book: 0, brilliant: 0, great: 0, best: 0, good: 0, miss: 0, mistake: 0, blunder: 0
+      };
+
+      let prevWhiteEv = { type: 'cp', value: 20 };
+
+      for (let i = 0; i < total; i++) {
+        const m = verboseMoves[i];
+        const fenBefore = temp.fen();
+        const moverColor = temp.turn();
+        const matBefore = materialBalance(temp, moverColor) - materialBalance(temp, moverColor === 'w' ? 'b' : 'w');
+
+        progText.textContent = `Analyzing move ${i + 1} of ${total} (${m.san})…`;
+        progBar.style.width = `${Math.round(((i + 0.5) / total) * 100)}%`;
+
+        const beforeRes = await runStockfishAsync({
+          kind: 'review', fen: fenBefore, turn: moverColor, skill: 20, depth: 10, movetime: 260, multipv: 2
+        });
+        const pv1 = beforeRes.pvMap[1];
+        const pv2 = beforeRes.pvMap[2];
+        const bestUci = pv1 ? pv1.move : beforeRes.best;
+        const bestWhiteEv = pv1 && pv1.scoreObj ? toWhitePerspective(pv1.scoreObj, moverColor) : prevWhiteEv;
+        const secondWhiteEv = pv2 && pv2.scoreObj ? toWhitePerspective(pv2.scoreObj, moverColor) : null;
+
+        temp.move({ from: m.from, to: m.to, promotion: m.promotion });
+        sanPrefix.push(m.san);
+        const fenAfter = temp.fen();
+        const matAfter = materialBalance(temp, moverColor) - materialBalance(temp, moverColor === 'w' ? 'b' : 'w');
+        const playedUci = m.from + m.to + (m.promotion || '');
+
+        let afterWhiteEv;
+        if (temp.in_checkmate()) {
+          afterWhiteEv = { type: 'cp', value: moverColor === 'w' ? 9999 : -9999 };
+        } else if (temp.in_draw()) {
+          afterWhiteEv = { type: 'cp', value: 0 };
+        } else if (playedUci === bestUci) {
+          afterWhiteEv = bestWhiteEv;
+        } else {
+          const afterRes = await runStockfishAsync({
+            kind: 'review', fen: fenAfter, turn: temp.turn(), skill: 20, depth: 10, movetime: 260, multipv: 1
+          });
+          const a1 = afterRes.pvMap[1];
+          afterWhiteEv = a1 && a1.scoreObj ? toWhitePerspective(a1.scoreObj, temp.turn()) : bestWhiteEv;
+        }
+        evalCache[fenAfter] = afterWhiteEv;
+
+        const cls = classifyMove({
+          sanSlice: sanPrefix.slice(),
+          playedUci, bestUci, bestWhiteEv, secondWhiteEv, afterWhiteEv, moverColor, matBefore, matAfter
+        });
+
+        counts[cls] = (counts[cls] || 0) + 1;
+        const sign = moverColor === 'w' ? 1 : -1;
+        const cpLoss = Math.max(0, scoreObjToWhiteCp(bestWhiteEv) * sign - scoreObjToWhiteCp(afterWhiteEv) * sign);
+
+        let bestSan = bestUci;
+        if (bestUci && bestUci.length >= 4) {
+          const t2 = new Chess(fenBefore);
+          const bm = t2.move({ from: bestUci.slice(0, 2), to: bestUci.slice(2, 4), promotion: bestUci[4] || 'q' });
+          if (bm) bestSan = bm.san;
+        }
+
+        analyzedMoves.push({
+          ply: i + 1, san: m.san, color: moverColor, cls, cpLoss, bestUci, bestSan, evalAfter: afterWhiteEv
+        });
+
+        prevWhiteEv = afterWhiteEv;
+      }
+
+      const calcAcc = (color) => {
+        const list = analyzedMoves.filter(x => x.color === color);
+        if (!list.length) return 100;
+        const avgLoss = list.reduce((acc, x) => acc + Math.min(300, x.cpLoss), 0) / list.length;
+        const acc = Math.max(15, Math.min(99.9, 103.1668 * Math.exp(-0.0045 * avgLoss) - 3.1668));
+        return Number(acc.toFixed(1));
+      };
+
+      reviewData = {
+        moves: analyzedMoves,
+        whiteAcc: calcAcc('w'),
+        blackAcc: calcAcc('b'),
+        counts
+      };
+
+      reviewRunning = false;
+      progBar.style.width = '100%';
+      progWrap.classList.add('hidden');
+
+      attachReviewToSavedGame(lastSavedGameId, reviewData);
+      viewPly = total;
+      updateUI();
+      evaluateDisplayedPosition();
+    }
+
+    function renderReviewSummary() {
+      const card = document.getElementById('reviewSummaryCard');
+      if (!reviewData) { card.classList.add('hidden'); return; }
+      card.classList.remove('hidden');
+      document.getElementById('whiteAccVal').textContent = `${reviewData.whiteAcc}%`;
+      document.getElementById('blackAccVal').textContent = `${reviewData.blackAcc}%`;
+
+      const order = ['brilliant', 'great', 'best', 'good', 'book', 'miss', 'mistake', 'blunder'];
+      document.getElementById('reviewCountsGrid').innerHTML = order.map(k => {
+        const meta = CLS_META[k];
+        return `<div class="count-chip">
+          <strong style="color:${meta.color};">${reviewData.counts[k] || 0}</strong>
+          <span>${meta.label}</span>
+        </div>`;
+      }).join('');
+    }
+
+    function renderMoveCallout() {
+      const box = document.getElementById('moveCallout');
+      const total = game ? game.history().length : 0;
+      const curPly = viewPly === null ? total : viewPly;
+
+      if (!reviewData || curPly === 0 || !reviewData.moves[curPly - 1]) {
+        box.classList.add('hidden');
+        return;
+      }
+      box.classList.remove('hidden');
+      const item = reviewData.moves[curPly - 1];
+      const meta = CLS_META[item.cls];
+      const moveNum = Math.ceil(item.ply / 2);
+      const prefix = item.color === 'w' ? `${moveNum}.` : `${moveNum}...`;
+
+      document.getElementById('calloutLeft').innerHTML =
+        `<span class="cls-tag ${meta.cls}">${meta.sym} ${meta.label}</span> <strong>${prefix} ${item.san}</strong>`;
+
+      const showBest = (item.cls === 'miss' || item.cls === 'mistake' || item.cls === 'blunder') && item.bestSan;
+      document.getElementById('calloutRight').textContent = showBest
+        ? `Best was ${item.bestSan} · Eval ${formatEvalWhite(item.evalAfter)}`
+        : `Eval ${formatEvalWhite(item.evalAfter)}`;
+    }
+
+    function pickProOpeningMove() {
+      if (!activeProPlayer || !activeProPlayer.openings) return null;
+      const hist = game.history();
+      if (hist.length > 5) return null;
+      const matches = [];
+      for (const line of activeProPlayer.openings) {
+        if (hist.length < line.length && hist.every((s, idx) => line[idx] === s)) {
+          matches.push(line[hist.length]);
+        }
+      }
+      if (!matches.length) return null;
+      const sanPick = matches[Math.floor(Math.random() * matches.length)];
+      const legal = game.moves({ verbose: true });
+      const m = legal.find(x => x.san === sanPick);
+      return m ? (m.from + m.to + (m.promotion || '')) : null;
+    }
+
+    function pickMoveForLevel(fallbackUci) {
+      const cfg = getActiveBotConfig();
+      const legal = game.moves({ verbose: true });
+      if (!legal.length) return fallbackUci;
+
+      if (cfg.blunderChance > 0 && Math.random() < cfg.blunderChance) {
+        const r = legal[Math.floor(Math.random() * legal.length)];
+        return r.from + r.to + (r.promotion || '');
+      }
+
+      const candidates = Object.keys(sfPvMap)
+        .sort((a, b) => Number(a) - Number(b))
+        .map(k => sfPvMap[k]);
+
+      if (!candidates.length || cfg.multipv === 1) {
+        return candidates[0] ? candidates[0].move : fallbackUci;
+      }
+
+      if (Math.random() < cfg.bestBias) return candidates[0].move;
+
+      const bestCp = candidates[0].cp;
+      const withinTolerance = candidates.filter(c => (bestCp - c.cp) <= cfg.maxCpLoss);
+      if (withinTolerance.length > 1) {
+        const alt = withinTolerance.slice(1);
+        return alt[Math.floor(Math.random() * alt.length)].move;
+      }
+      return candidates[0].move;
+    }
+
+    async function initStockfish() {
+      const badge = document.getElementById('engineBadge');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      try {
+        const resp = await fetch(STOCKFISH_CDN, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!resp.ok) throw new Error('Network error');
+        const scriptText = await resp.text();
+        const blob = new Blob([scriptText], { type: 'application/javascript' });
+        sfWorker = new Worker(URL.createObjectURL(blob));
+
+        sfWorker.onmessage = (e) => {
+          const line = typeof e.data === 'string' ? e.data : '';
+          if (line === 'uciok') {
+            sfReady = true;
+            badge.className = 'badge ready';
+            badge.innerHTML = '<span class="dot"></span>Stockfish Engine Ready';
+            if (gameStarted && !isGameOver() && game.turn() !== playerColor) requestBotMove();
+            else if (shouldShowEvalBar()) evaluateDisplayedPosition();
+          } else if (line.startsWith('info ')) {
+            parseStockfishInfo(line);
+          } else if (line.startsWith('bestmove')) {
+            const best = line.split(' ')[1];
+            const job = sfJob;
+            const pvSnapshot = { ...sfPvMap };
+            sfJob = null;
+            if (job && job.onDone) job.onDone(best, pvSnapshot);
+          }
+        };
+        sfWorker.postMessage('uci');
+      } catch (_) {
+        clearTimeout(timeoutId);
+        sfReady = false;
+        badge.className = 'badge fallback';
+        badge.innerHTML = '<span class="dot"></span>Built-in Bot Ready';
+        if (gameStarted && !isGameOver() && game.turn() !== playerColor) requestBotMove();
+      }
+    }
+
+    function evaluateBoardMaterialFor(c) {
+      const vals = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
+      const b = c.board();
+      let score = 0;
+      for (let r = 0; r < 8; r++) {
+        for (let col = 0; col < 8; col++) {
+          const p = b[r][col];
+          if (p) score += (p.color === 'w' ? 1 : -1) * vals[p.type];
+        }
+      }
+      return score;
+    }
+
+    function minimax(depth, alpha, beta) {
+      if (game.in_checkmate()) return -99999 - depth;
+      if (game.in_draw()) return 0;
+      if (depth === 0) {
+        const wScore = evaluateBoardMaterialFor(game);
+        return game.turn() === 'w' ? wScore : -wScore;
+      }
+      const moves = game.moves({ verbose: true });
+      let best = -Infinity;
+      for (const m of moves) {
+        game.move(m);
+        const val = -minimax(depth - 1, -beta, -alpha);
+        game.undo();
+        if (val > best) best = val;
+        if (best > alpha) alpha = best;
+        if (alpha >= beta) break;
+      }
+      return best;
+    }
+
+    function fallbackBestMove(forceBest = false) {
+      const cfg = getActiveBotConfig();
+      const moves = game.moves({ verbose: true });
+      if (!moves.length) return null;
+      if (!forceBest && cfg.blunderChance > 0 && Math.random() < cfg.blunderChance) {
+        const r = moves[Math.floor(Math.random() * moves.length)];
+        return r.from + r.to + (r.promotion || '');
+      }
+      const searchDepth = (forceBest || cfg.depth >= 9) ? 2 : 1;
+      let bestScore = -Infinity;
+      let bestMove = moves[0];
+      for (const m of moves) {
+        game.move(m);
+        let score = -minimax(searchDepth - 1, -Infinity, Infinity);
+        if (!forceBest && cfg.maxCpLoss > 0) score += (Math.random() - 0.5) * cfg.maxCpLoss;
+        game.undo();
+        if (score > bestScore) { bestScore = score; bestMove = m; }
+      }
+      return bestMove.from + bestMove.to + (bestMove.promotion || '');
+    }
+
+    function requestBotMove() {
+      if (!gameStarted || isGameOver() || botThinking) return;
+      botThinking = true;
+      currentHint = null;
+      updateControlsState();
+      updatePlayerBars();
+
+      const startedAt = performance.now();
+      const cfg = getActiveBotConfig();
+      const fenBefore = game.fen();
+      const turnBefore = game.turn();
+
+      const finishBotMove = (uciMove, pvMap) => {
+        if (pvMap && pvMap[1] && pvMap[1].scoreObj) {
+          evalCache[fenBefore] = toWhitePerspective(pvMap[1].scoreObj, turnBefore);
+        }
+        const elapsed = performance.now() - startedAt;
+        const waitMs = Math.max(0, 260 - elapsed);
+        setTimeout(() => {
+          botThinking = false;
+          if (!gameStarted || isGameOver() || !uciMove || uciMove === '(none)') {
+            if (isGameOver()) { stopClock(); saveCompletedGame(); }
+            updateUI();
+            return;
+          }
+          const move = game.move({
+            from: uciMove.slice(0, 2),
+            to: uciMove.slice(2, 4),
+            promotion: uciMove.length > 4 ? uciMove[4] : 'q'
+          });
+          if (move) {
+            if (timerEnabled && incSeconds > 0) {
+              if (move.color === 'w') whiteTimeMs += incSeconds * 1000;
+              else blackTimeMs += incSeconds * 1000;
+            }
+            lastMove = { from: move.from, to: move.to };
+            viewPly = null;
+            triggerMoveSound(move);
+            if (isGameOver()) { stopClock(); saveCompletedGame(); }
+            updateUI(move);
+            if (shouldShowEvalBar()) evaluateDisplayedPosition();
+          } else {
+            updateUI();
+          }
+        }, waitMs);
+      };
+
+      const bookUci = pickProOpeningMove();
+      if (bookUci) {
+        finishBotMove(bookUci, null);
+        return;
+      }
+
+      if (sfWorker && sfReady) {
+        runStockfishJob({
+          kind: 'bot', fen: fenBefore, turn: turnBefore,
+          skill: cfg.skill, depth: cfg.depth, movetime: cfg.movetime, multipv: cfg.multipv
+        }, (best, pvMap) => finishBotMove(pickMoveForLevel(best), pvMap));
+      } else {
+        finishBotMove(fallbackBestMove(false), null);
+      }
+    }
+
+    function requestBestMoveHint() {
+      if (!gameStarted || !enableSuggest || isGameOver() || botThinking || hintThinking || isPreviewing() || game.turn() !== playerColor) return;
+      hintThinking = true;
+      updateControlsState();
+
+      const fen = game.fen();
+      const turn = game.turn();
+
+      const showHintResult = (uci, pvMap) => {
+        hintThinking = false;
+        if (!uci || uci === '(none)') { updateControlsState(); return; }
+        const from = uci.slice(0, 2);
+        const to = uci.slice(2, 4);
+        const promo = uci.length > 4 ? uci[4] : 'q';
+
+        const temp = new Chess(fen);
+        const m = temp.move({ from, to, promotion: promo });
+        let evText = '';
+        if (pvMap && pvMap[1] && pvMap[1].scoreObj) {
+          const whiteEv = toWhitePerspective(pvMap[1].scoreObj, turn);
+          evalCache[fen] = whiteEv;
+          currentEval = whiteEv;
+          evText = ` · Eval ${formatEvalWhite(whiteEv)}`;
+          updateEvalBarUI();
+        }
+        currentHint = { from, to, san: m ? m.san : uci, evText };
+        updateUI();
+      };
+
+      if (sfWorker && sfReady) {
+        runStockfishJob({ kind: 'hint', fen, turn, skill: 20, depth: 12, movetime: 500, multipv: 1 }, showHintResult);
+      } else {
+        setTimeout(() => showHintResult(fallbackBestMove(true), null), 120);
+      }
+    }
+
+    function triggerMoveSound(move) {
+      if (isGameOver()) playSound('gameover');
+      else if (game.in_check()) playSound('check');
+      else if (move.captured) playSound('capture');
+      else playSound('move');
+    }
+
+    function squareToGridCoords(sqName) {
+      const files = 'abcdefgh';
+      const fileIdx = files.indexOf(sqName[0]);
+      const rankIdx = 8 - parseInt(sqName[1], 10);
+      const col = flipped ? 7 - fileIdx : fileIdx;
+      const row = flipped ? 7 - rankIdx : rankIdx;
+      return { row, col };
+    }
+
+    function renderBoardArrows() {
+      const svg = document.getElementById('arrowLayer');
+      svg.innerHTML = '';
+
+      let arrowFrom = null;
+      let arrowTo = null;
+      let color = 'rgba(56, 189, 248, 0.85)';
+
+      if (currentHint && !isPreviewing()) {
+        arrowFrom = currentHint.from;
+        arrowTo = currentHint.to;
+      } else if (reviewData) {
+        const total = game ? game.history().length : 0;
+        const curPly = viewPly === null ? total : viewPly;
+        const item = curPly > 0 ? reviewData.moves[curPly - 1] : null;
+        if (item && (item.cls === 'miss' || item.cls === 'mistake' || item.cls === 'blunder') && item.bestUci && item.bestUci.length >= 4) {
+          arrowFrom = item.bestUci.slice(0, 2);
+          arrowTo = item.bestUci.slice(2, 4);
+          color = 'rgba(52, 211, 153, 0.85)';
+        }
+      }
+
+      if (!arrowFrom || !arrowTo) return;
+
+      const fromPos = squareToGridCoords(arrowFrom);
+      const toPos = squareToGridCoords(arrowTo);
+      const x1 = fromPos.col * 100 + 50;
+      const y1 = fromPos.row * 100 + 50;
+      const x2 = toPos.col * 100 + 50;
+      const y2 = toPos.row * 100 + 50;
+
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const len = Math.hypot(dx, dy) || 1;
+      const endX = x2 - (dx / len) * 18;
+      const endY = y2 - (dy / len) * 18;
+
+      svg.innerHTML = `
+        <defs>
+          <marker id="hintArrowHead" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
+            <polygon points="0 0, 4 2, 0 4" fill="${color}" />
+          </marker>
+        </defs>
+        <line x1="${x1}" y1="${y1}" x2="${endX}" y2="${endY}"
+          stroke="${color}" stroke-width="18" stroke-linecap="round"
+          marker-end="url(#hintArrowHead)" />
+      `;
+    }
+
+    function animatePieceMove(move) {
+      if (!move || !move.from || !move.to) return;
+      const layer = document.getElementById('animLayer');
+      const destSq = document.querySelector(`[data-square="${move.to}"] .piece-wrap`);
+      if (!layer || !destSq) return;
+
+      if (animTimer) { clearTimeout(animTimer); animTimer = null; }
+
+      const fromPos = squareToGridCoords(move.from);
+      const toPos = squareToGridCoords(move.to);
+      const dx = toPos.col - fromPos.col;
+      const dy = toPos.row - fromPos.row;
+
+      destSq.classList.add('hidden-for-anim');
+      layer.innerHTML = '';
+
+      const floater = document.createElement('div');
+      floater.className = 'anim-piece';
+      floater.style.left = `${fromPos.col * 12.5}%`;
+      floater.style.top = `${fromPos.row * 12.5}%`;
+      floater.style.transform = 'translate(0%, 0%)';
+      floater.innerHTML = PIECE_SVGS[move.color + (move.promotion || move.piece)];
+      layer.appendChild(floater);
+
+      void floater.offsetWidth;
+      floater.style.transform = `translate(${dx * 100}%, ${dy * 100}%)`;
+
+      animTimer = setTimeout(() => {
+        destSq.classList.remove('hidden-for-anim');
+        layer.innerHTML = '';
+        animTimer = null;
+      }, 220);
+    }
+
+    function renderBoard() {
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      const display = getDisplayChess();
+      if (!display) return;
+      const dispChess = display.chess;
+      const dispLast = display.move;
+
+      const position = dispChess.board();
+      const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+      const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
+      const rowOrder = flipped ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7];
+      const colOrder = flipped ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7];
+      const inCheckColor = dispChess.in_check() ? dispChess.turn() : null;
+      const previewMode = isPreviewing();
+
+      for (const r of rowOrder) {
+        for (const c of colOrder) {
+          const sqName = files[c] + ranks[r];
+          const isLight = (r + c) % 2 === 0;
+          const sq = document.createElement('button');
+          sq.type = 'button';
+          sq.dataset.square = sqName;
+
+          let bgClass = isLight ? 'sq-light' : 'sq-dark';
+          if (dispLast && (dispLast.from === sqName || dispLast.to === sqName)) {
+            bgClass = isLight ? 'sq-last-light' : 'sq-last-dark';
+          }
+          if (!previewMode && selectedSquare === sqName) bgClass = 'sq-selected';
+          if (!previewMode && currentHint && (currentHint.from === sqName || currentHint.to === sqName)) {
+            bgClass += ' sq-hint';
+          }
+          sq.className = `sq ${bgClass}`;
+
+          const piece = position[r][c];
+          if (piece && piece.type === 'k' && piece.color === inCheckColor) {
+            const chk = document.createElement('div');
+            chk.className = 'sq-check';
+            sq.appendChild(chk);
+          }
+
+          if (piece) {
+            const wrap = document.createElement('div');
+            wrap.className = 'piece-wrap';
+            wrap.innerHTML = PIECE_SVGS[piece.color + piece.type];
+            sq.appendChild(wrap);
+          }
+
+          if (!previewMode && legalTargets.includes(sqName)) {
+            const ind = document.createElement('div');
+            ind.className = piece ? 'legal-capture' : 'legal-dot';
+            sq.appendChild(ind);
+          }
+
+          sq.addEventListener('click', () => handleSquareClick(sqName));
+          boardEl.appendChild(sq);
+        }
+      }
+      renderBoardArrows();
+    }
+
+    function handleSquareClick(sqName) {
+      if (!gameStarted || isGameOver() || botThinking || isPreviewing() || game.turn() !== playerColor) return;
+
+      if (selectedSquare && legalTargets.includes(sqName)) {
+        const piece = game.get(selectedSquare);
+        const isPromo = piece && piece.type === 'p' &&
+          ((piece.color === 'w' && sqName[1] === '8') || (piece.color === 'b' && sqName[1] === '1'));
+
+        if (isPromo) {
+          pendingPromo = { from: selectedSquare, to: sqName };
+          showPromoModal(piece.color);
+          return;
+        }
+        executePlayerMove(selectedSquare, sqName, 'q');
+        return;
+      }
+
+      const piece = game.get(sqName);
+      if (piece && piece.color === playerColor) {
+        selectedSquare = sqName;
+        legalTargets = game.moves({ square: sqName, verbose: true }).map(m => m.to);
+      } else {
+        selectedSquare = null;
+        legalTargets = [];
+      }
+      renderBoard();
+    }
+
+    function executePlayerMove(from, to, promotion) {
+      const move = game.move({ from, to, promotion });
+      selectedSquare = null;
+      legalTargets = [];
+      currentHint = null;
+      viewPly = null;
+      if (!move) { renderBoard(); return; }
+      if (timerEnabled && incSeconds > 0) {
+        if (move.color === 'w') whiteTimeMs += incSeconds * 1000;
+        else blackTimeMs += incSeconds * 1000;
+      }
+      lastMove = { from: move.from, to: move.to };
+      triggerMoveSound(move);
+      if (activeMatchMode === 'online' && fbConnected && activeOnlineMatchId) {
+        pushMoveToFirebase(move);
+      }
+      if (isGameOver()) {
+        stopClock();
+        if (activeMatchMode === 'online' && fbConnected) pushResultToFirebase('finished');
+        saveCompletedGame();
+      }
+      updateUI(move);
+      if (!isGameOver()) {
+        if (!(activeMatchMode === 'online' && fbConnected && activeOnlineMatchId)) {
+          requestBotMove();
+        }
+      } else if (shouldShowEvalBar()) {
+        evaluateDisplayedPosition();
+      }
+    }
+
+    function showPromoModal(color) {
+      const modal = document.getElementById('promoModal');
+      modal.querySelectorAll('.promo-choice').forEach(btn => {
+        btn.innerHTML = PIECE_SVGS[color + btn.dataset.piece];
+      });
+      modal.classList.remove('hidden');
+    }
+
+    function updateControlsState() {
+      const activePlay = gameStarted && !isGameOver();
+      const inReview = Boolean(reviewingSaved) || Boolean(reviewData);
+
+      const cfg = BOT_LEVELS[botLevel];
+      document.getElementById('levelLabel').textContent = `Level ${botLevel} (${cfg.elo} Elo)`;
+      document.getElementById('playBtn').textContent = `▶ Play vs Level ${botLevel} (${cfg.elo} Elo)`;
+
+      document.getElementById('navHomeBtn').disabled = activePlay || reviewRunning;
+      document.getElementById('navProBtn').disabled = activePlay || reviewRunning;
+      document.getElementById('navOnlineBtn').disabled = activePlay || reviewRunning;
+      document.getElementById('backHomeBtn').disabled = activePlay || reviewRunning;
+      document.getElementById('newGameBtn').disabled = activePlay || reviewRunning;
+      document.getElementById('undoBtn').disabled = !activePlay || botThinking || isPreviewing() || game.history().length === 0;
+
+      const underPanel = document.getElementById('underBoardPanel');
+      const showUnderPanel = activePlay || inReview;
+      underPanel.classList.toggle('hidden', !showUnderPanel);
+      document.getElementById('resignBtn').classList.toggle('hidden', !activePlay);
+      document.getElementById('movesHeading').textContent = inReview ? 'Game Review & Move Grades' : 'Move History & Preview';
+
+      const hasMoves = game && game.history().length > 0;
+      const canReview = hasMoves && (isGameOver() || Boolean(reviewingSaved)) && !activePlay && !reviewRunning;
+      const runReviewBtn = document.getElementById('runReviewBtn');
+      runReviewBtn.classList.toggle('hidden', !canReview || Boolean(reviewData));
+      runReviewBtn.disabled = reviewRunning;
+
+      const suggestBtn = document.getElementById('suggestBtn');
+      const showSuggest = activePlay && enableSuggest;
+      suggestBtn.classList.toggle('hidden', !showSuggest);
+      const canSuggest = showSuggest && !botThinking && !hintThinking && !isPreviewing() && game.turn() === playerColor;
+      suggestBtn.disabled = !canSuggest;
+      suggestBtn.textContent = hintThinking ? '⏳ Analyzing Best Move…' : '💡 Suggest Best Move';
+
+      const hintBox = document.getElementById('hintBox');
+      if (currentHint && !isPreviewing() && showSuggest) {
+        hintBox.className = 'hint-box visible';
+        document.getElementById('hintText').textContent = `Best Move: ${currentHint.san} (${currentHint.from}→${currentHint.to})${currentHint.evText}`;
+      } else {
+        hintBox.className = 'hint-box';
+      }
+
+      const total = game ? game.history().length : 0;
+      const curPly = viewPly === null ? total : viewPly;
+      document.getElementById('navFirstBtn').disabled = total === 0 || curPly === 0;
+      document.getElementById('navPrevBtn').disabled = total === 0 || curPly === 0;
+      document.getElementById('navNextBtn').disabled = total === 0 || curPly >= total;
+      document.getElementById('navLastBtn').disabled = total === 0 || curPly >= total;
+
+      const banner = document.getElementById('previewBanner');
+      if (isPreviewing()) {
+        banner.className = 'preview-banner visible';
+        document.getElementById('previewText').textContent = viewPly === 0
+          ? 'Previewing starting position'
+          : `Previewing move ${Math.ceil(viewPly / 2)} (${viewPly}/${total})`;
+      } else {
+        banner.className = 'preview-banner';
+      }
+    }
+
+    function updatePlayerBars() {
+      if (!game) return;
+      const activePlay = gameStarted && !isGameOver();
+      const inReview = Boolean(reviewingSaved) || Boolean(reviewData);
+      const displayLvl = (activePlay || inReview) ? activeGameLevel : botLevel;
+      const botColor = playerColor === 'w' ? 'Black' : 'White';
+      const userColor = playerColor === 'w' ? 'White' : 'Black';
+      const isUserTurn = activePlay && game.turn() === playerColor;
+      const isBotTurn = activePlay && game.turn() !== playerColor;
+
+      const botTitle = (activeMatchMode === 'online' && activeOnlineOpponent)
+        ? `${activeOnlineOpponent.country} @${activeOnlineOpponent.username} (${activeOnlineOpponent.rating}) · ${botColor}`
+        : (activeProPlayer
+          ? `${activeProPlayer.name} — ${activeProPlayer.elo} Elo (${botColor})`
+          : `Stockfish Bot — Level ${displayLvl} (${botColor})`);
+      const botSub = (activeMatchMode === 'online' && activeOnlineOpponent)
+        ? 'Online Rated Opponent'
+        : (activeProPlayer
+          ? `${activeProPlayer.flag || ''} ${activeProPlayer.style || 'Pro Bot'}`
+          : `Strength ${BOT_LEVELS[displayLvl].elo}`);
+      const botAvatarHtml = (activeMatchMode === 'online' && activeOnlineOpponent)
+        ? activeOnlineOpponent.avatar
+        : (activeProPlayer ? renderProAvatar(activeProPlayer, 'pro-avatar-sm') : '🤖');
+
+      const topIsBot = !flipped ? (playerColor === 'w') : (playerColor === 'b');
+      const topName = document.getElementById('topName');
+      const topMeta = document.getElementById('topMeta');
+      const topAvatar = document.getElementById('topAvatar');
+      const bottomName = document.getElementById('bottomName');
+      const bottomMeta = document.getElementById('bottomMeta');
+      const bottomAvatar = document.getElementById('bottomAvatar');
+
+      if (topIsBot) {
+        topAvatar.innerHTML = botAvatarHtml;
+        topAvatar.className = 'avatar';
+        topName.textContent = botTitle;
+        topMeta.textContent = botThinking ? 'Thinking…' : (isBotTurn ? 'To move' : botSub);
+        topMeta.className = `player-meta ${botThinking ? 'thinking' : ''}`;
+
+        bottomAvatar.textContent = userProfile ? (userProfile.avatar || '♞') : '👤';
+        bottomAvatar.className = 'avatar user';
+        bottomName.textContent = userProfile ? `${userProfile.country || ''} @${userProfile.username} (${userProfile.rating}) · ${userColor}` : `You (${userColor})`;
+        bottomMeta.textContent = reviewingSaved ? reviewingSaved.resultText : (isUserTurn ? 'Your turn' : 'Waiting');
+        bottomMeta.className = `player-meta ${isUserTurn ? 'turn' : ''}`;
+      } else {
+        topAvatar.textContent = userProfile ? (userProfile.avatar || '♞') : '👤';
+        topAvatar.className = 'avatar user';
+        topName.textContent = userProfile ? `${userProfile.country || ''} @${userProfile.username} (${userProfile.rating}) · ${userColor}` : `You (${userColor})`;
+        topMeta.textContent = reviewingSaved ? reviewingSaved.resultText : (isUserTurn ? 'Your turn' : 'Waiting');
+        topMeta.className = `player-meta ${isUserTurn ? 'turn' : ''}`;
+
+        bottomAvatar.innerHTML = botAvatarHtml;
+        bottomAvatar.className = 'avatar';
+        bottomName.textContent = botTitle;
+        bottomMeta.textContent = botThinking ? 'Thinking…' : (isBotTurn ? 'To move' : botSub);
+        bottomMeta.className = `player-meta ${botThinking ? 'thinking' : ''}`;
+      }
+      updateClocksUI();
+    }
+
+    function updateStatusAndMoves() {
+      if (!game) return;
+      const statusEl = document.getElementById('statusText');
+      const oppLabel = activeProPlayer ? `${activeProPlayer.name} (${activeProPlayer.elo})` : `Stockfish Level ${activeGameLevel}`;
+      if (reviewingSaved) {
+        statusEl.textContent = `Reviewing: vs ${oppLabel} · ${reviewingSaved.resultText}`;
+        statusEl.className = 'status-text';
+      } else if (resigned) {
+        statusEl.textContent = `You resigned — ${oppLabel} wins (Saved)`;
+        statusEl.className = 'status-text loss';
+      } else if (timedOutWinner) {
+        const youWon = timedOutWinner === playerColor;
+        statusEl.textContent = `Time out! ${timedOutWinner === 'w' ? 'White' : 'Black'} wins (${youWon ? 'You won!' : 'Bot won'}) — Saved`;
+        statusEl.className = `status-text ${youWon ? '' : 'loss'}`;
+      } else if (game.in_checkmate()) {
+        const winner = game.turn() === 'w' ? 'Black' : 'White';
+        const youWon = game.turn() !== playerColor;
+        statusEl.textContent = `Checkmate! ${winner} wins (${youWon ? 'You won!' : 'Bot won'}) — Saved`;
+        statusEl.className = `status-text ${youWon ? '' : 'loss'}`;
+      } else if (game.in_stalemate()) {
+        statusEl.textContent = 'Draw by Stalemate — Saved';
+        statusEl.className = 'status-text warn';
+      } else if (game.in_threefold_repetition()) {
+        statusEl.textContent = 'Draw by Threefold Repetition — Saved';
+        statusEl.className = 'status-text warn';
+      } else if (game.insufficient_material()) {
+        statusEl.textContent = 'Draw by Insufficient Material — Saved';
+        statusEl.className = 'status-text warn';
+      } else if (game.in_draw()) {
+        statusEl.textContent = 'Draw (50-move rule) — Saved';
+        statusEl.className = 'status-text warn';
+      } else if (game.in_check()) {
+        statusEl.textContent = `${game.turn() === 'w' ? 'White' : 'Black'} is in Check!`;
+        statusEl.className = 'status-text warn';
+      } else {
+        const turnName = game.turn() === 'w' ? 'White' : 'Black';
+        statusEl.textContent = game.turn() === playerColor
+          ? `${turnName} to move — your turn`
+          : `${turnName} to move — ${activeProPlayer ? activeProPlayer.name : 'Bot'} thinking…`;
+        statusEl.className = 'status-text';
+      }
+
+      const history = game.history();
+      const total = history.length;
+      const curPly = viewPly === null ? total : viewPly;
+      document.getElementById('moveCount').textContent = `${total} ${total === 1 ? 'move' : 'moves'}`;
+
+      const listEl = document.getElementById('moveList');
+      if (!total) {
+        listEl.innerHTML = '<div class="empty-moves">No moves yet. Make your opening move!</div>';
+      } else {
+        const badgeFor = (ply) => {
+          if (!reviewData || !reviewData.moves[ply - 1]) return '';
+          const meta = CLS_META[reviewData.moves[ply - 1].cls];
+          return `<span class="cls-tag ${meta.cls}">${meta.sym}</span>`;
+        };
+        let html = '';
+        for (let i = 0; i < total; i += 2) {
+          const num = Math.floor(i / 2) + 1;
+          const wPly = i + 1;
+          const bPly = i + 2;
+          const wActive = curPly === wPly ? 'active' : '';
+          const bActive = curPly === bPly ? 'active' : '';
+          html += `<div class="move-row">
+            <span class="move-num">${num}.</span>
+            <button type="button" data-ply="${wPly}" class="move-cell move-w ${wActive}"><span>${history[i]}</span>${badgeFor(wPly)}</button>
+            ${history[i + 1]
+              ? `<button type="button" data-ply="${bPly}" class="move-cell move-b ${bActive}"><span>${history[i + 1]}</span>${badgeFor(bPly)}</button>`
+              : '<span></span>'}
+          </div>`;
+        }
+        listEl.innerHTML = html;
+        listEl.querySelectorAll('.move-cell').forEach(btn => {
+          btn.addEventListener('click', () => jumpToPly(Number(btn.dataset.ply)));
+        });
+        if (viewPly === null) listEl.scrollTop = listEl.scrollHeight;
+      }
+    }
+
+    function jumpToPly(ply) {
+      if (!game) return;
+      const total = game.history().length;
+      if (ply >= total) viewPly = null;
+      else if (ply <= 0) viewPly = 0;
+      else viewPly = ply;
+      selectedSquare = null;
+      legalTargets = [];
+      updateUI();
+      if (shouldShowEvalBar()) evaluateDisplayedPosition();
+    }
+
+    function updateUI(animatedMove = null) {
+      renderBoard();
+      if (animatedMove && !isPreviewing()) animatePieceMove(animatedMove);
+      updateControlsState();
+      updatePlayerBars();
+      updateStatusAndMoves();
+      updateEvalBarUI();
+      renderReviewSummary();
+      renderMoveCallout();
+    }
+
+    function startMatch({ isPro }) {
+      activeMatchMode = 'bot';
+      activeOnlineOpponent = null;
+      if (!game || reviewRunning) return;
+      if (isPro) {
+        const p = PRO_PLAYERS.find(x => x.id === selectedProId) || PRO_PLAYERS[0];
+        activeProPlayer = { ...p, elo: selectedProElo };
+        playerColor = proPlayerColor;
+        enableEvalBar = proEnableEvalBar;
+        enableSuggest = proEnableSuggest;
+        readTimeFrom('proTimeSelect', 'proCustomMinInput', 'proCustomIncInput');
+      } else {
+        activeProPlayer = null;
+        readTimeFrom('timeSelect', 'customMinInput', 'customIncInput');
+      }
+
+      whiteTimeMs = baseMinutes * 60 * 1000;
+      blackTimeMs = baseMinutes * 60 * 1000;
+
+      reviewingSaved = null;
+      reviewData = null;
+      lastSavedGameId = null;
+      gameStarted = true;
+      resigned = false;
+      timedOutWinner = null;
+      savedThisGame = false;
+      activeGameLevel = botLevel;
+      botThinking = false;
+      hintThinking = false;
+      currentHint = null;
+      sfJob = null;
+      selectedSquare = null;
+      legalTargets = [];
+      lastMove = null;
+      viewPly = null;
+      currentEval = { type: 'cp', value: 0 };
+      game.reset();
+      flipped = (playerColor === 'b');
+      document.getElementById('resignModal').classList.add('hidden');
+      showPage('arena');
+      updateUI();
+      startClock();
+      if (playerColor === 'b') requestBotMove();
+    }
+
+    function goHome() {
+      if (reviewRunning || (gameStarted && !isGameOver())) return;
+      stopClock();
+      reviewingSaved = null;
+      reviewData = null;
+      gameStarted = false;
+      showPage('home');
+      updateControlsState();
+    }
+
+    // Navigation
+    document.getElementById('navHomeBtn').addEventListener('click', goHome);
+    document.getElementById('backHomeBtn').addEventListener('click', goHome);
+    document.getElementById('navProBtn').addEventListener('click', () => {
+      if (reviewRunning || (gameStarted && !isGameOver())) return;
+      showPage('pro');
+    });
+    document.getElementById('openProPageBtn').addEventListener('click', () => showPage('pro'));
+    document.getElementById('navArenaBtn').addEventListener('click', () => {
+      if (gameStarted || reviewingSaved || reviewData) showPage('arena');
+    });
+
+    // Pro Page Controls
+    document.getElementById('proSearchInput').addEventListener('input', (e) => renderProPage(e.target.value));
+    document.getElementById('proWhiteBtn').addEventListener('click', () => {
+      proPlayerColor = 'w';
+      document.getElementById('proWhiteBtn').className = 'btn-seg active';
+      document.getElementById('proBlackBtn').className = 'btn-seg';
+    });
+    document.getElementById('proBlackBtn').addEventListener('click', () => {
+      proPlayerColor = 'b';
+      document.getElementById('proWhiteBtn').className = 'btn-seg';
+      document.getElementById('proBlackBtn').className = 'btn-seg active';
+    });
+    document.getElementById('proTimeSelect').addEventListener('change', (e) => {
+      document.getElementById('proCustomTimeRow').classList.toggle('hidden', e.target.value !== 'custom');
+    });
+    document.getElementById('proToggleEvalChk').addEventListener('change', (e) => { proEnableEvalBar = e.target.checked; });
+    document.getElementById('proToggleSuggestChk').addEventListener('change', (e) => { proEnableSuggest = e.target.checked; });
+    document.getElementById('proStartBtn').addEventListener('click', () => startMatch({ isPro: true }));
+
+    // Home Page Controls
+    document.getElementById('levelSlider').addEventListener('input', (e) => {
+      botLevel = Number(e.target.value);
+      updateControlsState();
+    });
+    document.getElementById('timeSelect').addEventListener('change', (e) => {
+      document.getElementById('customTimeRow').classList.toggle('hidden', e.target.value !== 'custom');
+    });
+    document.getElementById('toggleEvalChk').addEventListener('change', (e) => { enableEvalBar = e.target.checked; });
+    document.getElementById('toggleSuggestChk').addEventListener('change', (e) => { enableSuggest = e.target.checked; });
+    document.getElementById('playWhiteBtn').addEventListener('click', () => {
+      playerColor = 'w';
+      document.getElementById('playWhiteBtn').className = 'btn-seg active';
+      document.getElementById('playBlackBtn').className = 'btn-seg';
+    });
+    document.getElementById('playBlackBtn').addEventListener('click', () => {
+      playerColor = 'b';
+      document.getElementById('playWhiteBtn').className = 'btn-seg';
+      document.getElementById('playBlackBtn').className = 'btn-seg active';
+    });
+
+    document.getElementById('playBtn').addEventListener('click', () => startMatch({ isPro: false }));
+    document.getElementById('newGameBtn').addEventListener('click', () => startMatch({ isPro: Boolean(activeProPlayer) }));
+    document.getElementById('runReviewBtn').addEventListener('click', runFullGameReview);
+    document.getElementById('suggestBtn').addEventListener('click', requestBestMoveHint);
+    document.getElementById('clearHintBtn').addEventListener('click', () => { currentHint = null; updateUI(); });
+
+    document.getElementById('resignBtn').addEventListener('click', () => {
+      if (!gameStarted || isGameOver()) return;
+      document.getElementById('resignModal').classList.remove('hidden');
+    });
+    document.getElementById('cancelResignBtn').addEventListener('click', () => {
+      document.getElementById('resignModal').classList.add('hidden');
+    });
+    document.getElementById('confirmResignBtn').addEventListener('click', () => {
+      document.getElementById('resignModal').classList.add('hidden');
+      if (!gameStarted || isGameOver()) return;
+      stopClock();
+      resigned = true;
+      botThinking = false;
+      hintThinking = false;
+      currentHint = null;
+      sfJob = null;
+      selectedSquare = null;
+      legalTargets = [];
+      viewPly = null;
+      playSound('gameover');
+      if (activeMatchMode === 'online' && fbConnected && activeOnlineMatchId) {
+        pushResultToFirebase(`resigned:${playerColor}`);
+      }
+      saveCompletedGame();
+      updateUI();
+    });
+
+    document.getElementById('flipBtn').addEventListener('click', () => { flipped = !flipped; updateUI(); });
+    document.getElementById('undoBtn').addEventListener('click', () => {
+      if (!gameStarted || isGameOver() || botThinking || isPreviewing() || game.history().length === 0) return;
+      game.undo();
+      if (game.turn() !== playerColor && game.history().length > 0) game.undo();
+      selectedSquare = null; legalTargets = []; lastMove = null; viewPly = null; currentHint = null;
+      updateUI();
+      if (shouldShowEvalBar()) evaluateDisplayedPosition();
+    });
+
+    document.getElementById('navFirstBtn').addEventListener('click', () => jumpToPly(0));
+    document.getElementById('navPrevBtn').addEventListener('click', () => {
+      if (!game) return;
+      const total = game.history().length;
+      const cur = viewPly === null ? total : viewPly;
+      jumpToPly(cur - 1);
+    });
+    document.getElementById('navNextBtn').addEventListener('click', () => {
+      if (!game) return;
+      const total = game.history().length;
+      const cur = viewPly === null ? total : viewPly;
+      jumpToPly(cur + 1);
+    });
+    document.getElementById('navLastBtn').addEventListener('click', () => jumpToPly(game ? game.history().length : 0));
+    document.getElementById('backToLiveBtn').addEventListener('click', () => jumpToPly(game ? game.history().length : 0));
+
+    document.addEventListener('keydown', (e) => {
+      if (currentPage !== 'arena' || !game || game.history().length === 0) return;
+      const total = game.history().length;
+      const cur = viewPly === null ? total : viewPly;
+      if (e.key === 'ArrowLeft') jumpToPly(cur - 1);
+      else if (e.key === 'ArrowRight') jumpToPly(cur + 1);
+    });
+
+    document.getElementById('muteBtn').addEventListener('click', () => {
+      muted = !muted;
+      document.getElementById('muteBtn').textContent = muted ? '🔇 Muted' : '🔊 Sound On';
+    });
+    document.querySelectorAll('.promo-choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('promoModal').classList.add('hidden');
+        if (pendingPromo) {
+          const { from, to } = pendingPromo;
+          pendingPromo = null;
+          executePlayerMove(from, to, btn.dataset.piece);
+        }
+      });
+    });
+
+
+    document.getElementById('profileBtn').addEventListener('click', openProfileModal);
+    document.getElementById('closeProfileModalBtn').addEventListener('click', () => {
+      document.getElementById('profileModal').classList.add('hidden');
+    });
+    function updateOnlinePageState() {
+      const hasId = Boolean(userProfile && userProfile.username);
+      document.getElementById('onlineNeedIdBox').classList.toggle('hidden', hasId);
+      document.getElementById('findOnlineBtn').disabled = !hasId;
+    }
+
+    document.getElementById('saveProfileBtn').addEventListener('click', () => {
+      const raw = document.getElementById('profUsername').value.trim();
+      const errEl = document.getElementById('profError');
+      const sugEl = document.getElementById('profSuggestRow');
+      sugEl.style.display = 'none';
+      sugEl.innerHTML = '';
+
+      if (!/^[A-Za-z0-9_-]{3,20}$/.test(raw)) {
+        errEl.textContent = 'Use 3–20 characters with only letters, numbers, _ or -.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      const taken = getTakenUsernames();
+      const isOwnCurrent = userProfile && userProfile.username.toLowerCase() === raw.toLowerCase();
+      if (!isOwnCurrent && taken.some(x => x.toLowerCase() === raw.toLowerCase())) {
+        errEl.textContent = `"${raw}" is already taken. Add numbers or _ / -:`;
+        errEl.style.display = 'block';
+        const alts = [
+          `${raw}_${Math.floor(10 + Math.random() * 89)}`,
+          `${raw}-${Math.floor(100 + Math.random() * 899)}`
+        ];
+        sugEl.style.display = 'flex';
+        sugEl.innerHTML = alts.map(a => `<button type="button" class="btn-ghost" data-alt-name="${a}">${a}</button>`).join('');
+        sugEl.querySelectorAll('[data-alt-name]').forEach(b => {
+          b.addEventListener('click', () => {
+            document.getElementById('profUsername').value = b.dataset.altName;
+            errEl.style.display = 'none';
+            sugEl.style.display = 'none';
+          });
+        });
+        return;
+      }
+
+      errEl.style.display = 'none';
+      registerTakenUsername(raw);
+      const country = document.getElementById('profCountry').value;
+      const avatar = document.getElementById('profAvatarIcon').value;
+      const nextProf = userProfile
+        ? { ...userProfile, username: raw, country, avatar }
+        : { username: raw, country, avatar, rating: 1200, wins: 0, losses: 0, draws: 0 };
+      saveProfileData(nextProf);
+      document.getElementById('profileModal').classList.add('hidden');
+      updateOnlinePageState();
+    });
+
+    document.getElementById('navOnlineBtn').addEventListener('click', () => {
+      if (reviewRunning || (gameStarted && !isGameOver())) return;
+      showPage('online');
+    });
+    document.getElementById('openOnlinePageBtn').addEventListener('click', () => showPage('online'));
+    document.getElementById('onlineCreateIdBtn').addEventListener('click', openProfileModal);
+
+    document.querySelectorAll('.online-tc-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedOnlineTc = btn.dataset.onlineTc;
+        document.querySelectorAll('.online-tc-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('findOnlineBtn').textContent = `🔍 Find Online Match (${btn.textContent})`;
+      });
+    });
+
+    function launchOnlineMatch({ opp, assignedColor, tcStr, matchId = null }) {
+      activeOnlineOpponent = opp;
+      activeOnlineMatchId = matchId;
+      fbMoveCountSynced = 0;
+      activeMatchMode = 'online';
+      activeProPlayer = null;
+      playerColor = assignedColor;
+      enableEvalBar = false;
+      enableSuggest = false;
+
+      const [m, inc] = tcStr.split('|').map(Number);
+      timerEnabled = true;
+      baseMinutes = m;
+      incSeconds = inc;
+      whiteTimeMs = m * 60 * 1000;
+      blackTimeMs = m * 60 * 1000;
+
+      reviewingSaved = null;
+      reviewData = null;
+      lastSavedGameId = null;
+      gameStarted = true;
+      resigned = false;
+      timedOutWinner = null;
+      savedThisGame = false;
+      botThinking = false;
+      hintThinking = false;
+      currentHint = null;
+      sfJob = null;
+      selectedSquare = null;
+      legalTargets = [];
+      lastMove = null;
+      viewPly = null;
+      currentEval = { type: 'cp', value: 0 };
+      game.reset();
+      flipped = (playerColor === 'b');
+      document.getElementById('resignModal').classList.add('hidden');
+      showPage('arena');
+      updateUI();
+      startClock();
+
+      if (matchId && fbDb) {
+        fbMatchRef = fbDb.ref(`matches/${matchId}`);
+        fbMatchRef.on('value', (snap) => {
+          const data = snap.val();
+          if (!data) return;
+          if (data.status && data.status.startsWith('resigned:') && !isGameOver()) {
+            const who = data.status.split(':')[1];
+            if (who !== playerColor) {
+              stopClock();
+              timedOutWinner = playerColor; // Opponent resigned -> you win
+              playSound('gameover');
+              saveCompletedGame();
+              updateUI();
+              return;
+            }
+          }
+          const movesObj = data.moves || {};
+          const keys = Object.keys(movesObj).map(Number).sort((a, b) => a - b);
+          while (fbMoveCountSynced < keys.length) {
+            const mv = movesObj[fbMoveCountSynced];
+            fbMoveCountSynced++;
+            if (!mv) break;
+            if (mv.by !== userProfile.username) {
+              const applied = game.move({ from: mv.from, to: mv.to, promotion: mv.promotion || undefined });
+              if (applied) {
+                if (timerEnabled && incSeconds > 0) {
+                  if (applied.color === 'w') whiteTimeMs += incSeconds * 1000;
+                  else blackTimeMs += incSeconds * 1000;
+                }
+                lastMove = { from: applied.from, to: applied.to };
+                viewPly = null;
+                triggerMoveSound(applied);
+                if (isGameOver()) { stopClock(); saveCompletedGame(); }
+                updateUI(applied);
+              }
+            }
+          }
+        });
+      } else if (playerColor === 'b') {
+        requestBotMove();
+      }
+    }
+
+
+
+    document.getElementById('findOnlineBtn').addEventListener('click', async () => {
+      if (!userProfile || reviewRunning) return;
+      cleanupOnlineListeners();
+      const findBtn = document.getElementById('findOnlineBtn');
+      const status = document.getElementById('onlineSearchStatus');
+      findBtn.disabled = true;
+      status.classList.remove('hidden');
+
+      if (fbConnected && fbDb) {
+        try {
+          const tcKey = selectedOnlineTc.replace('|', '_');
+          const queuePath = fbDb.ref(`queue/${tcKey}`);
+          const snap = await queuePath.once('value');
+          const waiting = snap.val();
+          let partnerKey = null;
+          let partner = null;
+          if (waiting) {
+            for (const k of Object.keys(waiting)) {
+              if (waiting[k] && waiting[k].username !== userProfile.username && !waiting[k].matchId) {
+                partnerKey = k;
+                partner = waiting[k];
+                break;
+              }
+            }
+          }
+
+          if (partner && partnerKey) {
+            const matchId = `m_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+            const iAmWhite = Math.random() < 0.5;
+            const whitePlayer = iAmWhite ? userProfile : partner;
+            const blackPlayer = iAmWhite ? partner : userProfile;
+            await fbDb.ref(`matches/${matchId}`).set({
+              tc: selectedOnlineTc,
+              white: { username: whitePlayer.username, country: whitePlayer.country, avatar: whitePlayer.avatar, rating: whitePlayer.rating },
+              black: { username: blackPlayer.username, country: blackPlayer.country, avatar: blackPlayer.avatar, rating: blackPlayer.rating },
+              status: 'active'
+            });
+            await queuePath.child(partnerKey).update({
+              matchId,
+              matchedWith: { username: userProfile.username, country: userProfile.country, avatar: userProfile.avatar, rating: userProfile.rating },
+              assignedColor: iAmWhite ? 'b' : 'w'
+            });
+            status.classList.add('hidden');
+            findBtn.disabled = false;
+            launchOnlineMatch({
+              opp: { username: partner.username, country: partner.country, avatar: partner.avatar, rating: partner.rating },
+              assignedColor: iAmWhite ? 'w' : 'b',
+              tcStr: selectedOnlineTc,
+              matchId
+            });
+            return;
+          } else {
+            fbQueueRef = queuePath.push({
+              username: userProfile.username,
+              country: userProfile.country || '🌍',
+              avatar: userProfile.avatar || '♞',
+              rating: userProfile.rating,
+              matchId: null
+            });
+            try { fbQueueRef.onDisconnect().remove(); } catch (_) {}
+            fbQueueRef.on('value', (s2) => {
+              const val = s2.val();
+              if (val && val.matchId) {
+                const mId = val.matchId;
+                const opp = val.matchedWith;
+                const col = val.assignedColor;
+                fbQueueRef.off();
+                fbQueueRef.remove();
+                fbQueueRef = null;
+                status.classList.add('hidden');
+                findBtn.disabled = false;
+                launchOnlineMatch({ opp, assignedColor: col, tcStr: selectedOnlineTc, matchId: mId });
+              }
+            });
+            return;
+          }
+        } catch (_) {}
+      }
+
+      // Fallback: Local Simulated Online Match
+      setTimeout(() => {
+        status.classList.add('hidden');
+        findBtn.disabled = false;
+        const pool = [
+          { username: 'Aarav_Chess', country: '🇮🇳', avatar: '♞' },
+          { username: 'Sofia-99', country: '🇪🇸', avatar: '♛' },
+          { username: 'Liam_Tactics', country: '🇺🇸', avatar: '⚡' },
+          { username: 'Kenji_Blitz', country: '🇯🇵', avatar: '🔥' },
+          { username: 'Elena-GM', country: '🇫🇷', avatar: '♜' }
+        ];
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        const oppRating = Math.max(600, userProfile.rating + Math.floor(Math.random() * 70 - 35));
+        launchOnlineMatch({
+          opp: { ...pick, rating: oppRating },
+          assignedColor: Math.random() < 0.5 ? 'w' : 'b',
+          tcStr: selectedOnlineTc,
+          matchId: null
+        });
+      }, 900);
+    });
+
+    function bootApp() {
+      if (!game) {
+        const st = document.getElementById('statusText');
+        st.textContent = 'Chess rules script did not load — check internet connection and refresh.';
+        st.className = 'status-text loss';
+        return;
+      }
+      initFirebaseFromSaved();
+      userProfile = loadProfile();
+      renderProfileUI();
+      renderSavedGames();
+      renderProPage();
+      showPage('home');
+      updateControlsState();
+      initStockfish();
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootApp);
+    } else {
+      bootApp();
+    }
+  </script>
+</body>
+</html>
